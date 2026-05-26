@@ -11,7 +11,8 @@
     "fmt": "prettier --write '**/*.{ts,js,json,md}' && forge fmt",
     "generate:yul": "npx tsx generate-yul.ts && forge fmt",
     "generate:huff": "npx tsx generate-huff.ts",
-    "generate:gas-report": "./gas-report.sh"
+    "generate:gas-report": "./gas-report.sh",
+    "verify:constants": "npx tsx scripts/verify-constants.ts"
   },
   "keywords": [
     "solidity",
