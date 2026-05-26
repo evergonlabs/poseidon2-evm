@@ -3,6 +3,7 @@ pragma solidity ^0.8.30;
 
 import {Test} from "forge-std/Test.sol";
 import {LibPoseidon2Sponge} from "../../src/eip8182/LibPoseidon2Sponge.sol";
+import {InvalidHashNArity} from "../../src/eip8182/IPoseidon2.sol";
 
 /// @title Eip8182VectorsTest
 /// @notice Walks every supported vector in assets/eip-8182/poseidon2_vectors.json
@@ -52,11 +53,13 @@ contract Eip8182VectorsTest is Test {
             bytes32[] memory inputs = allInputs[i];
             uint256 arity = inputs.length;
 
-            // Arities 0 and 1 are intentionally unsupported by this library:
-            // hashN reverts with InvalidHashNArity for n < 2. The EIP includes
-            // these vectors to describe the raw permutation, but our sponge
-            // wrapper starts at arity 2. Skip and continue.
+            // EIP-8182 supports arity 0/1; spec §3 deliberately rejects them in
+            // our hashN (a domain tag with no payload is a misuse). Assert the
+            // rejection here so a future regression that loosens the arity guard
+            // is caught.
             if (arity < 2) {
+                vm.expectRevert(abi.encodeWithSelector(InvalidHashNArity.selector, arity));
+                this._callHashN(inputs);
                 continue;
             }
 
@@ -76,13 +79,7 @@ contract Eip8182VectorsTest is Test {
             assertEq(
                 actual,
                 allOutputs[i],
-                string.concat(
-                    "vector #",
-                    vm.toString(i),
-                    " mismatch (arity ",
-                    vm.toString(arity),
-                    ")"
-                )
+                string.concat("vector #", vm.toString(i), " mismatch (arity ", vm.toString(arity), ")")
             );
             exercised++;
         }
