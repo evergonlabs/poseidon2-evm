@@ -14,7 +14,7 @@ contract LibPoseidon2SpongeTest is Test {
     function test_poseidon2_permute_returns_full_state() public pure {
         _assertFourLaneOutput(1, 2, 3, 2 << 64);
         _assertFourLaneOutput(
-            // Realistic field-element inputs (e.g. note-commitment-shaped values).
+            // Realistic field-element inputs (canonical values below PRIME).
             0x1762d324c2db6a912e607fd09664aaa02dfe45b90711c0dae9627d62a4207788,
             0x1047bd52da536f6bdd26dfe642d25d9092c458e64a78211298648e81414cbf35,
             0x0a529bb6bbbf25ed33a47a4637dc70eb469a29893047482866748ae7f3a5afe1,
@@ -219,7 +219,7 @@ contract HashNMultiBlockTest is Test {
     }
 
     function test_hashN_arity17_matches_reference() public view {
-        // Worst-case intentHash arity per spec §7. ⌈17/3⌉ = 6 permutations.
+        // Worst-case arity per spec §7. ⌈17/3⌉ = 6 permutations.
         bytes32[] memory inputs = new bytes32[](17);
         for (uint256 i = 0; i < 17; i++) {
             inputs[i] = bytes32(uint256(0xdead00 + i));

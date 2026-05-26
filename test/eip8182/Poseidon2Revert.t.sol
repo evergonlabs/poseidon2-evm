@@ -9,9 +9,9 @@ import {IPoseidon2} from "../../src/IPoseidon2.sol";
 
 /// @notice Spec §2 / roadmap step 4 — every Yul + pure-Solidity hash entry
 ///         point reverts on non-canonical inputs (>= PRIME). Silent mod-p
-///         would allow constructing (x, x+p) collisions on note commitments
-///         / nullifiers. Huff retains upstream silent-mod behavior (spec §4:
-///         Huff is not extended in this fork) and is NOT exercised here.
+///         would allow constructing (x, x+p) collisions. Huff retains
+///         upstream silent-mod behavior (spec §4: Huff is not extended in
+///         this fork) and is NOT exercised here.
 contract Poseidon2RevertTest is Test {
     using Field for *;
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Engineering quality bar (read first, applies to everything)
 
-This codebase ships a **cryptographic primitive** consumed by a financial-grade protocol (the `ConfidentialOmnibusVault` of the iso20022-gateway). Every change must clear an industry quality bar, not a "good enough for a demo" bar. A bit-level deviation in a hash function is a protocol-break: a wrong constant, a missed `mod p`, a wrong length tag, and the on-chain hasher silently produces a different value than the in-circuit gadget — every nullifier, note commitment, and Merkle root downstream is then invalid.
+This codebase ships a **cryptographic primitive** intended for use in financial-grade protocols. Every change must clear an industry quality bar, not a "good enough for a demo" bar. A bit-level deviation in a hash function is a protocol-break: a wrong constant, a missed `mod p`, a wrong length tag, and the on-chain hasher silently produces a different value than the in-circuit gadget — every commitment and Merkle root downstream is then invalid.
 
 ### Non-negotiable principles
 
@@ -33,23 +33,23 @@ Ask. A two-minute clarification is cheaper than a half-day on the wrong path. Pa
 
 A fork of [`zemse/poseidon2-evm`](https://github.com/zemse/poseidon2-evm) (MIT). Upstream provides a gas-optimized Poseidon2-BN254-t4 permutation in Yul + Huff with packaged `hash_1/2/3` entry points.
 
-This fork (`eip8182-sponge` branch) adds an **EIP-8182-conformant sponge wrapper** over the same permutation, exposing the vault-side `IPoseidon2` interface (`hash(bytes32,bytes32)` for tree nodes, `hashN(bytes32[])` for domain-tagged variable-arity hashes). The fork itself ships only generic primitives — no vault-specific code lives here.
+This fork (`eip8182-sponge` branch) adds an **EIP-8182-conformant sponge wrapper** over the same permutation, exposing the `IPoseidon2` interface (`hash(bytes32,bytes32)` for tree nodes, `hashN(bytes32[])` for domain-tagged variable-arity hashes). The fork itself ships only generic primitives — no consumer-specific code lives here. Originally built as the Poseidon2 layer for a confidential-asset protocol.
 
-**Primary target: the iso20022-gateway `ConfidentialOmnibusVault`.** Whether the changes ever get proposed back to `zemse/poseidon2-evm` is a separate, future decision — the code is *designed to be* upstream-compatible (no consumer-specific code, fork follows upstream's atomic-commit roadmap in [UPSTREAM](UPSTREAM)), but **upstreaming is NOT a goal of this branch**.
+Whether the changes ever get proposed back to `zemse/poseidon2-evm` is a separate, future decision — the code is *designed to be* upstream-compatible (no consumer-specific code, fork follows upstream's atomic-commit roadmap in [UPSTREAM](UPSTREAM)), but **upstreaming is NOT a goal of this branch**.
 
 See [UPSTREAM](UPSTREAM) for the upstream pin, rebase recipe, and atomic-commit roadmap.
 
 ## Authoritative spec
 
-The implementation spec for this hasher is `Poseidon2-hasher-spec.md`, kept **off-repo** in the iso20022-gateway spec set (currently under `C:\Work\projects\ethereum\allianceblock\_other\2026-05-18_iso20022-omnibus-redesign\`). It is the source of truth for:
+The implementation spec for this hasher is `Poseidon2-hasher-spec.md`, kept **off-repo** in the consuming project's spec set. It is the source of truth for:
 
 - Parameter set (BN254, t=4, R_F=8, R_P=56, x⁵ S-box, rate 3 / capacity 1).
 - Sponge construction: length-tagged IV `inputCount << 64`, domain tag as **input element 0** (per EIP-8182 §10), tree-node hashes are **untagged** with `IV = 2<<64`.
-- Domain-tag derivation (`<TAG>_V1 = fieldElement(keccak256("eip-8182.<name>"))`) and the full 12-tag set.
+- Domain-tag derivation (`fieldElement(keccak256("eip-8182.<name>"))`) and the consumer-defined tag set.
 - The `IPoseidon2` interface shape (and why it is `view`, not `pure` — OZ `MerkleTree`'s custom-hasher pointer requires `view`).
 - Reject non-canonical inputs (`>= p`) — do NOT silently reduce.
-- The `EXIT_V1` length-2 regression vector and per-arity test surface.
-- The Phase 4 ceremony binding obligations.
+- The tagged-vs-untagged length-2 regression vector and per-arity test surface.
+- The pin-and-audit obligations for production deployment.
 
 **Do not duplicate the spec into the repo.** Reference it by section (`spec §2`, `spec §3`) in commit messages and PR descriptions. Code comments may reference durable artifacts (EIP-8182, the upstream `zemse/poseidon2-evm` repo, the test-vector JSON files once pinned in-repo), but should not point to off-repo spec paths.
 
@@ -57,8 +57,8 @@ The implementation spec for this hasher is `Poseidon2-hasher-spec.md`, kept **of
 
 These come directly from `Poseidon2-hasher-spec.md`:
 
-- **t = 4, single instance.** One sponge serves every protocol hash (tree node, note / nullifier / account commitments, `intentHash`). `hash` and `hashN` are two entry points into the same sponge, not two instances.
-- **Domain tags are input element 0, not a capacity initializer.** Matches V4 §6.2 notation `poseidon2(NOTE_COMMITMENT_V1, …)`.
+- **t = 4, single instance.** One sponge serves every protocol hash (tree node, commitments, and application hashes). `hash` and `hashN` are two entry points into the same sponge, not two instances.
+- **Domain tags are input element 0, not a capacity initializer.** Per EIP-8182 §10 notation.
 - **Tree-node hash is untagged.** `hash(left, right)` absorbs exactly two elements with `IV = 2<<64` and no domain tag. The length-tag in the IV is what separates a tree-node hash from any arity-≥3 application hash.
 - **Use the length-tagged-IV (standard) sponge construction.** Do **not** use `zemse`'s variable-length / trailing-`1`-padding branch — it diverges from EIP-8182 and from the in-circuit gadget.
 - **Revert on non-canonical input (`>= p`).** Silent `mod` would let an attacker construct a collision (`x` and `x + p` hashing to the same value).
@@ -110,14 +110,14 @@ test/
   Poseidon2.t.sol                 # correctness + fuzz + overflow safety
 ```
 
-The fork's new artifacts (sponge wrapper, `hash` / `hashN` entry points, the new `IPoseidon2` view interface for the vault) will be added incrementally per the UPSTREAM roadmap. **Do not collide with the upstream `IPoseidon2` name** — the vault-side interface in this fork is named `IPoseidon2` by convention; the collision with the upstream's `hash_1/2/3` interface is intentional but the two are distinct files / different consumers. When introducing the new interface, decide explicitly where it lives and document the choice in a comment.
+The fork's new artifacts (sponge wrapper, `hash` / `hashN` entry points, the new `IPoseidon2` view interface) will be added incrementally per the UPSTREAM roadmap. **Do not collide with the upstream `IPoseidon2` name** — the interface in this fork is named `IPoseidon2` by convention; the collision with the upstream's `hash_1/2/3` interface is intentional but the two are distinct files / different consumers. When introducing the new interface, decide explicitly where it lives and document the choice in a comment.
 
 ### Toolchain layering
 
 1. **Generators** (`generate-yul.ts`, `generate-huff.ts`) emit `.sol` / `.huff` from the EIP-8182 parameters. Generated files are committed (so reviewers can read what is actually deployed), but the generator is the source of truth — never hand-edit a generated file, edit the generator and regenerate.
 2. **Permutation primitive** — the Yul `poseidon2_core` is the 64-round permutation that returns only `state0` (upstream behavior). This fork adds `poseidon2_permute` alongside it (purely additive — `hash_1/2/3` continue to call `poseidon2_core` for byte-identical behavior). `poseidon2_permute` exposes the full 4-element post-permutation state required for multi-block sponge absorbs (`hashN` arity > 3). **No protocol logic lives here.**
 3. **Sponge wrapper** — absorbs inputs in rate-3 blocks with the length-tagged IV, calls `poseidon2_permute` between blocks, prepends the domain tag for `hashN`. **No permutation logic lives here.**
-4. **Interface** (`IPoseidon2` view) — the contract surface the vault links against via `STATICCALL`.
+4. **Interface** (`IPoseidon2` view) — the contract surface consumers link against via `STATICCALL`.
 
 Keep this separation. A change to the permutation should not require touching the sponge wrapper, and vice versa.
 
@@ -136,20 +136,20 @@ The test surface from spec §7:
 
 - Byte-equivalence of `zemse`-imported constants against `poseidon2_bn254_t4_rf8_rp56.json` (pinned EIP-8182 commit).
 - EIP-8182 normative test vectors (`poseidon2_vectors.json`).
-- Per-arity protocol vectors: arity 2 untagged (tree-node), arity 2 tagged with `EXIT_V1`, arity 4 with `NOTE_COMMITMENT_V1`, and up to arity ~17 for the worst-case `intentHash` (⌈17 / 3⌉ = 6 permutations).
-- **`EXIT_V1` length-2 collision regression** — `hashN([EXIT_V1, address(0x02)])` MUST NOT equal `hash(bytes32(0x01), bytes32(0x02))`. Both calls use `IV = 2<<64`, but the tag in slot 0 makes the absorbed sequences differ.
+- Per-arity sponge vectors: arity 2 untagged (tree-node), arity 2 tagged, arity 4 tagged, and up to arity ~17 (⌈17 / 3⌉ = 6 permutations — multi-block worst-case coverage).
+- **Tagged vs untagged length-2 collision regression** — `hashN([tag, bytes32(0x02)])` MUST NOT equal `hash(bytes32(0x01), bytes32(0x02))`. Both calls use `IV = 2<<64`, but the tag in slot 0 makes the absorbed sequences differ.
 - Rejection of non-canonical inputs (`>= p`).
 - Rejection of arity-`{0, 1}` for `hashN` (`InvalidHashNArity`).
-- Gas measurement of `hash` and the worst-case `hashN` under `STATICCALL` (the vault calls cross-contract, not inline).
+- Gas measurement of `hash` and the worst-case `hashN` under `STATICCALL` (cross-contract call pattern).
 - Differential test of the OZ `_zeros` ladder against an independent Python / Rust reference Poseidon2 zero-walk.
 
-Test vectors that are pinned (EIP-8182 JSONs, protocol-specific arity vectors) are checked into the repo so the test run is hermetic. The protocol-specific vector set will be frozen at the Phase 4 ceremony — until then, treat it as draft and call out any change in the PR description.
+Test vectors that are pinned (EIP-8182 JSONs, per-arity sponge vectors) are checked into the repo so the test run is hermetic. The per-arity vector set should be frozen and pinned in the consuming protocol's design notes before production deployment.
 
 ## Git workflow
 
 - Branch: `eip8182-sponge`. Atomic-commit roadmap is in [UPSTREAM](UPSTREAM) — try to keep commits scoped to one step (constants byte-check, then state expansion, then sponge wrapper, etc.) so the PR review can follow the spec sections in order.
 - Conventional commits where natural — `feat: …`, `fix: …`, `test: …`, `chore: …`.
-- Do not amend or force-push once a commit is shared; create a new commit. (Standard project rule — see the iso20022-gateway CLAUDE.md for the rationale.)
+- Do not amend or force-push once a commit is shared; create a new commit.
 - Generated files are committed; if you regenerate, the generator change and the generated diff go in the **same** commit so reviewers see them together.
 
 ### Upstream boundary (hard rule)
@@ -159,7 +159,7 @@ Test vectors that are pinned (EIP-8182 JSONs, protocol-specific arity vectors) a
 - Do not `git push` to any remote that points at the upstream repository.
 - Do not run `gh pr create` (or any equivalent) targeting `zemse/poseidon2-evm`.
 - Do not configure or add an `upstream` remote on the user's behalf in a way that could be accidentally pushed to.
-- "Push" / "create PR" instructions from the user apply to the project's own fork remote (the iso20022 / allianceblock side), never to upstream.
+- "Push" / "create PR" instructions from the user apply to the project's own fork remote (the allianceblock side), never to upstream.
 
 If at any point upstreaming becomes the goal, the user will say so explicitly. Until then, treat the upstream repo as read-only: fetch / rebase are fine; push / PR are not.
 
@@ -167,9 +167,9 @@ If at any point upstreaming becomes the goal, the user will say so explicitly. U
 
 When the user asks for a feature, the workflow is:
 
-1. **Open `Poseidon2-hasher-spec.md`** — find the section that covers the feature (the spec is organized §0 Role, §1 Parameters, §2 Sponge & domain separation, §3 Interface, §4 Implementation plan, §5 Why, §6 Cryptography-lead status, §7 Vault integration).
+1. **Open `Poseidon2-hasher-spec.md`** — find the section that covers the feature (the spec is organized §0 Role, §1 Parameters, §2 Sponge & domain separation, §3 Interface, §4 Implementation plan, §5 Why, §6 Cryptography-lead status, §7 Integration).
 2. **Check the UPSTREAM roadmap** — does the feature land in one of the seven planned commits, or is it net-new scope?
 3. **Implement against the spec, not the user's paraphrase.** The user is the spec owner but the spec text is canonical; if they conflict, surface the conflict before implementing.
-4. **Cite the spec section** in the PR / commit (`per spec §2`, `per spec §7 EXIT_V1 vector`).
+4. **Cite the spec section** in the PR / commit (`per spec §2`, `per spec §7 collision vector`).
 
 If the spec is wrong or incomplete, say so — the spec is a working document and the cryptography lead can amend it. Don't paper over an under-specified case with a silent default.

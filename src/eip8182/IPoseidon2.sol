@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.8;
 
-/// @title IPoseidon2 (EIP-8182 sponge, vault-side)
-/// @notice The view interface ConfidentialOmnibusVault links Poseidon2 through.
+/// @title IPoseidon2 (EIP-8182 sponge)
+/// @notice View interface for the EIP-8182-conformant Poseidon2-BN254-t4 sponge.
 /// @dev    This is NOT the upstream zemse/poseidon2-evm IPoseidon2 (which
 ///         exposes hash_1/2/3 over uint256); the collision is of names only.
 ///         See src/IPoseidon2.sol for the upstream interface.
@@ -21,8 +21,8 @@ interface IPoseidon2 {
     function hash(bytes32 left, bytes32 right) external view returns (bytes32);
 
     /// @notice Fixed-arity, domain-separated absorption.
-    /// @dev    inputs[0] MUST be the *_V1 domain tag computed per EIP-8182 §10
-    ///         as fieldElement(keccak256("eip-8182.<tag_name>")) (spec §2).
+    /// @dev    inputs[0] MUST be the domain tag computed per EIP-8182 §10 as
+    ///         fieldElement(keccak256("eip-8182.<name>")) (spec §2).
     ///         Reverts InvalidHashNArity(length) on inputs.length == 0 or 1
     ///         (a tag with no payload is a misuse).
     ///         Reverts InvalidFieldElement(value) on any inputs[i] >= PRIME.

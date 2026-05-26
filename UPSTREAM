@@ -29,9 +29,9 @@ length-tagged IV, domain-tag-as-input-0 prepending, and canonical-input
 rejection.
 
 Generic improvements only; **no consumer-specific code in this branch**
-(the motivating consumer is the iso20022-gateway ConfidentialOmnibusVault
-contract, but all changes here are upstream-compatible and could be
-proposed back to zemse/poseidon2-evm).
+(originally motivated by a confidential-asset protocol's commitment scheme,
+but all changes here are upstream-compatible and could be proposed back to
+zemse/poseidon2-evm).
 
 ## Atomic-commit roadmap
 
@@ -41,12 +41,12 @@ proposed back to zemse/poseidon2-evm).
   4. [x] Reject non-canonical inputs (>= p)                         — Task 3
   5. [x] EIP-8182 normative test vectors                            — Tasks 1, 9
   6. [x] Per-arity protocol test vectors (2, 4, ..., ~17)           — Task 10
-  7. [x] EXIT_V1 length-2 collision regression vector               — Task 11
+  7. [x] Tagged vs untagged length-2 collision regression vector    — Task 11
 
 ## Spec
 
 The implementation specification for the Poseidon2 hasher lives off-repo
-in the iso20022-gateway project's spec set (Poseidon2-hasher-spec.md).
+in the consuming project's spec set (Poseidon2-hasher-spec.md).
 Ask the maintainer for the current location if needed.
 
 ## License

@@ -6,9 +6,8 @@ import {LibPoseidon2Sponge} from "./LibPoseidon2Sponge.sol";
 
 /// @title Poseidon2_EIP8182
 /// @notice EIP-8182-conformant Poseidon2-BN254-t4 sponge hasher.
-/// @dev    Deployable singleton — the ConfidentialOmnibusVault references one
-///         instance via `address public immutable poseidon2` and reaches it
-///         through STATICCALL. Spec: Poseidon2-hasher-spec.md §0, §3, §7.
+/// @dev    Deployable singleton. Consumers reference one deployed instance and
+///         reach it through STATICCALL. Spec: Poseidon2-hasher-spec.md §0, §3.
 ///
 ///         Holds no storage. STATICCALL sandboxes it from caller storage.
 ///         The implementation functions are `pure`; the interface is `view`
