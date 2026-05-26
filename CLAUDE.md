@@ -33,7 +33,9 @@ Ask. A two-minute clarification is cheaper than a half-day on the wrong path. Pa
 
 A fork of [`zemse/poseidon2-evm`](https://github.com/zemse/poseidon2-evm) (MIT). Upstream provides a gas-optimized Poseidon2-BN254-t4 permutation in Yul + Huff with packaged `hash_1/2/3` entry points.
 
-This fork (`eip8182-sponge` branch) adds an **EIP-8182-conformant sponge wrapper** over the same permutation, exposing the vault-side `IPoseidon2` interface (`hash(bytes32,bytes32)` for tree nodes, `hashN(bytes32[])` for domain-tagged variable-arity hashes). The motivating consumer is the iso20022-gateway `ConfidentialOmnibusVault`, but the fork itself ships only generic primitives — no vault-specific code lives here, and the changes are intended to be upstream-compatible.
+This fork (`eip8182-sponge` branch) adds an **EIP-8182-conformant sponge wrapper** over the same permutation, exposing the vault-side `IPoseidon2` interface (`hash(bytes32,bytes32)` for tree nodes, `hashN(bytes32[])` for domain-tagged variable-arity hashes). The fork itself ships only generic primitives — no vault-specific code lives here.
+
+**Primary target: the iso20022-gateway `ConfidentialOmnibusVault`.** Whether the changes ever get proposed back to `zemse/poseidon2-evm` is a separate, future decision — the code is *designed to be* upstream-compatible (no consumer-specific code, fork follows upstream's atomic-commit roadmap in [UPSTREAM](UPSTREAM)), but **upstreaming is NOT a goal of this branch**.
 
 See [UPSTREAM](UPSTREAM) for the upstream pin, rebase recipe, and atomic-commit roadmap.
 
@@ -149,6 +151,17 @@ Test vectors that are pinned (EIP-8182 JSONs, protocol-specific arity vectors) a
 - Conventional commits where natural — `feat: …`, `fix: …`, `test: …`, `chore: …`.
 - Do not amend or force-push once a commit is shared; create a new commit. (Standard project rule — see the iso20022-gateway CLAUDE.md for the rationale.)
 - Generated files are committed; if you regenerate, the generator change and the generated diff go in the **same** commit so reviewers see them together.
+
+### Upstream boundary (hard rule)
+
+**Never push to `zemse/poseidon2-evm` and never open a PR against it.** Whether and when to upstream is a manual, human-only decision. Specifically:
+
+- Do not `git push` to any remote that points at the upstream repository.
+- Do not run `gh pr create` (or any equivalent) targeting `zemse/poseidon2-evm`.
+- Do not configure or add an `upstream` remote on the user's behalf in a way that could be accidentally pushed to.
+- "Push" / "create PR" instructions from the user apply to the project's own fork remote (the iso20022 / allianceblock side), never to upstream.
+
+If at any point upstreaming becomes the goal, the user will say so explicitly. Until then, treat the upstream repo as read-only: fetch / rebase are fine; push / PR are not.
 
 ## Working with the spec
 
