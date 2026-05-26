@@ -35,13 +35,13 @@ proposed back to zemse/poseidon2-evm).
 
 ## Atomic-commit roadmap
 
-  1. Expose state1..state3 from poseidon2_core (Yul generator)
-  2. Length-tagged-IV sponge construction (EIP-8182 §10)
-  3. hashN with domain-tag input-0 and arity-{0,1} guard (InvalidHashNArity)
-  4. Reject non-canonical inputs (>= p)
-  5. EIP-8182 normative test vectors
-  6. Per-arity protocol test vectors (2, 4, ..., ~17 for intentHash)
-  7. EXIT_V1 length-2 collision regression vector
+  1. [x] Expose state1..state3 from poseidon2_core (Yul generator)  — Task 2
+  2. [x] Length-tagged-IV sponge construction (EIP-8182 §10)        — Tasks 4–7
+  3. [x] hashN with domain-tag input-0 and arity-{0,1} guard        — Tasks 6–7
+  4. [x] Reject non-canonical inputs (>= p)                         — Task 3
+  5. [x] EIP-8182 normative test vectors                            — Tasks 1, 9
+  6. [x] Per-arity protocol test vectors (2, 4, ..., ~17)           — Task 10
+  7. [x] EXIT_V1 length-2 collision regression vector               — Task 11
 
 ## Spec
 
