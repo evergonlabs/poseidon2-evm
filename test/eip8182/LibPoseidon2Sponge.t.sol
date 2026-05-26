@@ -4,6 +4,7 @@ pragma solidity ^0.8.30;
 import {Test} from "forge-std/Test.sol";
 import {LibPoseidon2Yul} from "../../src/bn254/yul/LibPoseidon2Yul.sol";
 import {IPoseidon2} from "../../src/eip8182/IPoseidon2.sol";
+import {LibPoseidon2Sponge} from "../../src/eip8182/LibPoseidon2Sponge.sol";
 
 contract LibPoseidon2SpongeTest is Test {
     /// @notice poseidon2_permute MUST return the full 4-element post-permutation state.
@@ -55,5 +56,39 @@ contract InterfaceShapeTest is Test {
         IPoseidon2 hasher = IPoseidon2(address(0));
         function(bytes32, bytes32) external view returns (bytes32) ptr = hasher.hash;
         ptr; // silence unused warning
+    }
+}
+
+contract HashTreeNodeTest is Test {
+    function test_hash_treenode_matches_zemse_hash2_vectors() public pure {
+        // Same vectors as test/Poseidon2.t.sol::test_hash_2_vectors.
+        // Tree-node hash is bare 2-input absorption with IV = 2<<64 — identical
+        // to upstream hash_2. Spec §2: "Per EIP-8182, Merkle tree-node hashes
+        // are bare 2-input absorptions with IV = 2<<64 and no domain tag."
+        bytes32 l = bytes32(uint256(0x1762d324c2db6a912e607fd09664aaa02dfe45b90711c0dae9627d62a4207788));
+        bytes32 r = bytes32(uint256(0x1047bd52da536f6bdd26dfe642d25d9092c458e64a78211298648e81414cbf35));
+        bytes32 expected = bytes32(uint256(0x303cacb84a267e5f3f46914fd3262dcaa212930c27a2f9de22c080dd9857be35));
+        assertEq(LibPoseidon2Sponge.hash(l, r), expected, "tree-node hash mismatch");
+    }
+
+    function test_hash_treenode_zero_left_zero_right() public pure {
+        bytes32 expected = bytes32(uint256(0x0b63a53787021a4a962a452c2921b3663aff1ffd8d5510540f8e659e782956f1));
+        assertEq(LibPoseidon2Sponge.hash(bytes32(0), bytes32(0)), expected, "tree-node hash(0,0) mismatch");
+    }
+
+    function test_hash_treenode_reverts_on_non_canonical_left() public {
+        bytes32 nonCanonical = bytes32(LibPoseidon2Sponge.PRIME());
+        vm.expectRevert();
+        this._callHash(nonCanonical, bytes32(uint256(1)));
+    }
+
+    function test_hash_treenode_reverts_on_non_canonical_right() public {
+        bytes32 nonCanonical = bytes32(LibPoseidon2Sponge.PRIME());
+        vm.expectRevert();
+        this._callHash(bytes32(uint256(1)), nonCanonical);
+    }
+
+    function _callHash(bytes32 left, bytes32 right) external pure returns (bytes32) {
+        return LibPoseidon2Sponge.hash(left, right);
     }
 }
