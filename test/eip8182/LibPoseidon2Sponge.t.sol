@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibPoseidon2Yul} from "../../src/bn254/yul/LibPoseidon2Yul.sol";
 import {IPoseidon2} from "../../src/eip8182/IPoseidon2.sol";
 import {LibPoseidon2Sponge} from "../../src/eip8182/LibPoseidon2Sponge.sol";
+import {InvalidHashNArity} from "../../src/eip8182/IPoseidon2.sol";
 
 contract LibPoseidon2SpongeTest is Test {
     /// @notice poseidon2_permute MUST return the full 4-element post-permutation state.
@@ -90,5 +91,71 @@ contract HashTreeNodeTest is Test {
 
     function _callHash(bytes32 left, bytes32 right) external pure returns (bytes32) {
         return LibPoseidon2Sponge.hash(left, right);
+    }
+}
+
+contract HashNSinglePermutationTest is Test {
+    /// @notice hashN with two inputs MUST equal upstream hash_2 of those inputs
+    ///         (same IV = 2<<64, same single permutation, return state[0]).
+    function test_hashN_arity2_matches_zemse_hash2() public view {
+        bytes32[] memory inputs = new bytes32[](2);
+        inputs[0] = bytes32(uint256(0x1762d324c2db6a912e607fd09664aaa02dfe45b90711c0dae9627d62a4207788));
+        inputs[1] = bytes32(uint256(0x1047bd52da536f6bdd26dfe642d25d9092c458e64a78211298648e81414cbf35));
+        bytes32 expected = bytes32(uint256(0x303cacb84a267e5f3f46914fd3262dcaa212930c27a2f9de22c080dd9857be35));
+        assertEq(this._callHashN(inputs), expected, "hashN arity-2 mismatch");
+    }
+
+    function test_hashN_arity3_matches_zemse_hash3() public view {
+        bytes32[] memory inputs = new bytes32[](3);
+        inputs[0] = bytes32(uint256(0x300ced31bf248a1a2d4ea02b5e9f302a9e34df3c2109d5f1046ee9f59de6f6f1));
+        inputs[1] = bytes32(uint256(0x2e6eb409ed7f41949cdb1925ac3ec68132b2443d873589a8afde4c027c3c0b68));
+        inputs[2] = bytes32(uint256(0x2f08443953fc54fb351e41a46da99bbec1d290dae2907d2baf5174ed28eee9ea));
+        bytes32 expected = bytes32(uint256(0x27e4cf07e4bf24219f6a2da9be19cea601313a95f8a1360cf8f15d474826bf49));
+        assertEq(this._callHashN(inputs), expected, "hashN arity-3 mismatch");
+    }
+
+    function test_hashN_arity0_reverts() public {
+        bytes32[] memory inputs = new bytes32[](0);
+        vm.expectRevert(abi.encodeWithSelector(InvalidHashNArity.selector, uint256(0)));
+        this._callHashN(inputs);
+    }
+
+    function test_hashN_arity1_reverts() public {
+        bytes32[] memory inputs = new bytes32[](1);
+        inputs[0] = bytes32(uint256(1));
+        vm.expectRevert(abi.encodeWithSelector(InvalidHashNArity.selector, uint256(1)));
+        this._callHashN(inputs);
+    }
+
+    function test_hashN_arity2_reverts_on_non_canonical() public {
+        bytes32[] memory inputs = new bytes32[](2);
+        inputs[0] = bytes32(LibPoseidon2Sponge.PRIME());
+        inputs[1] = bytes32(uint256(1));
+        vm.expectRevert();
+        this._callHashN(inputs);
+    }
+
+    /// @notice hash(left, right) and hashN([left, right]) MUST produce the
+    ///         same output — both are arity-2 with IV = 2<<64 and no auto-
+    ///         tag prepending. (hashN doesn't auto-prepend; the caller is
+    ///         expected to put the tag in inputs[0] when desired.)
+    function test_hash_treenode_equals_hashN_two_inputs() public view {
+        bytes32 l = bytes32(uint256(0x14ba77172ab2278bdf5a087ca0bd400e936bafe6dfc092c4e7a1b0950f1b6dbe));
+        bytes32 r = bytes32(uint256(0x195c41f12d4fbac5e194c201536f3094541e73bf27d9f2413f09e731b3838733));
+        bytes32 viaHash = LibPoseidon2Sponge.hash(l, r);
+
+        bytes32[] memory inputs = new bytes32[](2);
+        inputs[0] = l;
+        inputs[1] = r;
+        bytes32 viaHashN = this._callHashN(inputs);
+
+        assertEq(viaHash, viaHashN, "hash and hashN must agree on bare 2-input absorption");
+    }
+
+    /// @notice External wrapper. hashN takes `calldata`, so calling via
+    ///         `this._callHashN(inputs)` copies the memory array into calldata
+    ///         at the ABI-encoding boundary.
+    function _callHashN(bytes32[] calldata inputs) external pure returns (bytes32) {
+        return LibPoseidon2Sponge.hashN(inputs);
     }
 }
