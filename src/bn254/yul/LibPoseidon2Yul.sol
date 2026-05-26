@@ -23,10 +23,26 @@ library LibPoseidon2Yul {
         assembly {
             let PRIME := 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
 
-            let state0 := mod(s0, PRIME)
-            let state1 := mod(s1, PRIME)
-            let state2 := mod(s2, PRIME)
-            let state3 := mod(s3, PRIME)
+            // EIP-8182: reject non-canonical inputs. Spec §2 — silent mod p would
+            // let an attacker construct (x, x+p) collisions.
+            if iszero(lt(s0, PRIME)) {
+                mstore(0, s0)
+                revert(0, 32)
+            }
+            if iszero(lt(s1, PRIME)) {
+                mstore(0, s1)
+                revert(0, 32)
+            }
+            if iszero(lt(s2, PRIME)) {
+                mstore(0, s2)
+                revert(0, 32)
+            }
+            // IV (s3) is constructed internally as inputCount<<64 — always < PRIME.
+
+            let state0 := s0
+            let state1 := s1
+            let state2 := s2
+            let state3 := s3
 
             // Apply 1st linear layer
 
@@ -2806,10 +2822,26 @@ library LibPoseidon2Yul {
         assembly {
             let PRIME := 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
 
-            let state0 := mod(s0, PRIME)
-            let state1 := mod(s1, PRIME)
-            let state2 := mod(s2, PRIME)
-            let state3 := mod(s3, PRIME)
+            // EIP-8182: reject non-canonical inputs. Spec §2 — silent mod p would
+            // let an attacker construct (x, x+p) collisions.
+            if iszero(lt(s0, PRIME)) {
+                mstore(0, s0)
+                revert(0, 32)
+            }
+            if iszero(lt(s1, PRIME)) {
+                mstore(0, s1)
+                revert(0, 32)
+            }
+            if iszero(lt(s2, PRIME)) {
+                mstore(0, s2)
+                revert(0, 32)
+            }
+            // IV (s3) is constructed internally as inputCount<<64 — always < PRIME.
+
+            let state0 := s0
+            let state1 := s1
+            let state2 := s2
+            let state3 := s3
 
             // Apply 1st linear layer
 

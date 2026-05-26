@@ -8,8 +8,11 @@ library Field {
     uint256 constant PRIME = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001;
     uint256 constant PRIME_DIV_2 = 0x183227397098d014dc2822db40c0ac2e9419f4243cdcb848a1f0fac9f8000000;
 
+    error InvalidFieldElement(uint256 value);
+
     function checkField(Field.Type a) internal pure {
-        require(Field.Type.unwrap(a) < PRIME, "Field: input is too large");
+        uint256 raw = Field.Type.unwrap(a);
+        if (raw >= PRIME) revert InvalidFieldElement(raw);
     }
 
     function toFieldUnchecked(uint256 a) internal pure returns (Field.Type b) {
