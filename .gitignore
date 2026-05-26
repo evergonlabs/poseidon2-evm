@@ -17,3 +17,11 @@ docs/
 node_modules/
 
 archive
+
+# Local Claude config
+.claude/
+CLAUDE.local.md
+
+# Foundry lockfile (newer foundry auto-generates this; upstream zemse/poseidon2-evm
+# doesn't commit it — gitignoring matches the upstream posture).
+foundry.lock
