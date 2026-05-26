@@ -114,6 +114,26 @@ contract ProtocolVectorsTest is Test {
         assertTrue(this._callHashN(a) != this._callHashN(b), "different tag must produce different hash");
     }
 
+    /// @notice Spec §7 — the EXIT_V1 length-2 collision regression.
+    ///
+    ///         hash(bytes32(0x01), bytes32(0x02)) is the bare 2-input tree-node
+    ///         hash. hashN([EXIT_V1, bytes32(0x02)]) is a 2-input absorption
+    ///         where slot 0 is the EXIT_V1 domain tag. BOTH use IV = 2<<64.
+    ///         The ONLY structural difference is the slot-0 value — these MUST
+    ///         NOT collide. If they ever do, the inputCount=2 collision
+    ///         argument has broken (likely the hashN path stopped treating
+    ///         slot 0 as a regular input, or the IV computation diverged).
+    function test_EXIT_V1_length2_collision_regression() public view {
+        bytes32 viaHash = LibPoseidon2Sponge.hash(bytes32(uint256(0x01)), bytes32(uint256(0x02)));
+
+        bytes32[] memory inputs = new bytes32[](2);
+        inputs[0] = Eip8182Tag.EXIT_V1();
+        inputs[1] = bytes32(uint256(0x02));
+        bytes32 viaHashN = this._callHashN(inputs);
+
+        assertTrue(viaHash != viaHashN, "EXIT_V1 length-2 collision: structural lock broken");
+    }
+
     // ---- Print all 12 derived tag hex values (for gateway-side pinning) ----
     function test_print_tags() public {
         emit log_named_bytes32("NOTE_COMMITMENT_V1", Eip8182Tag.NOTE_COMMITMENT_V1());
