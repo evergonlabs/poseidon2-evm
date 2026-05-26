@@ -33,8 +33,7 @@ contract ProtocolVectorsTest is Test {
         bytes32[] memory pair = new bytes32[](2);
         pair[0] = l;
         pair[1] = r;
-        assertEq(LibPoseidon2Sponge.hash(l, r), _reference(pair),
-            "tree-node hash matches reference");
+        assertEq(LibPoseidon2Sponge.hash(l, r), _reference(pair), "tree-node hash matches reference");
     }
 
     // ---- Arity 2 tagged with EXIT_V1: exitRecipientHash / relayerAddressHash ----
@@ -50,28 +49,29 @@ contract ProtocolVectorsTest is Test {
         bytes32[] memory inputs = new bytes32[](4);
         inputs[0] = Eip8182Tag.NOTE_COMMITMENT_V1();
         inputs[1] = bytes32(uint256(0xfeed01)); // noteBodyCommitment
-        inputs[2] = bytes32(uint256(7));        // leafIndex
+        inputs[2] = bytes32(uint256(7)); // leafIndex
         inputs[3] = bytes32(uint256(0xfeed02)); // ingestField
-        assertEq(this._callHashN(inputs), _reference(inputs),
-            "NOTE_COMMITMENT_V1(arity4) matches reference");
+        assertEq(this._callHashN(inputs), _reference(inputs), "NOTE_COMMITMENT_V1(arity4) matches reference");
     }
 
     // ---- Arity 10 — V4 §7.1 noteBodyCommitment absorption shape ----
     function test_protocol_arity10_NOTE_BODY_V1() public view {
         bytes32[] memory inputs = new bytes32[](10);
         inputs[0] = Eip8182Tag.NOTE_BODY_V1();
-        for (uint256 i = 1; i < 10; i++) inputs[i] = bytes32(uint256(0xb0d0 + i));
-        assertEq(this._callHashN(inputs), _reference(inputs),
-            "NOTE_BODY_V1(arity10) matches reference");
+        for (uint256 i = 1; i < 10; i++) {
+            inputs[i] = bytes32(uint256(0xb0d0 + i));
+        }
+        assertEq(this._callHashN(inputs), _reference(inputs), "NOTE_BODY_V1(arity10) matches reference");
     }
 
     // ---- Arity 17 — worst-case intentHash (⌈17/3⌉ = 6 permutations) ----
     function test_protocol_arity17_INTENT_V1() public view {
         bytes32[] memory inputs = new bytes32[](17);
         inputs[0] = Eip8182Tag.INTENT_V1();
-        for (uint256 i = 1; i < 17; i++) inputs[i] = bytes32(uint256(0x1a7700 + i));
-        assertEq(this._callHashN(inputs), _reference(inputs),
-            "INTENT_V1(arity17) matches reference");
+        for (uint256 i = 1; i < 17; i++) {
+            inputs[i] = bytes32(uint256(0x1a7700 + i));
+        }
+        assertEq(this._callHashN(inputs), _reference(inputs), "INTENT_V1(arity17) matches reference");
     }
 
     // ---- Tag uniqueness: all 12 tags must be distinct ----
@@ -92,8 +92,9 @@ contract ProtocolVectorsTest is Test {
         ];
         for (uint256 i = 0; i < 12; i++) {
             for (uint256 j = i + 1; j < 12; j++) {
-                assertTrue(tags[i] != tags[j],
-                    string.concat("tags ", vm.toString(i), " and ", vm.toString(j), " collide"));
+                assertTrue(
+                    tags[i] != tags[j], string.concat("tags ", vm.toString(i), " and ", vm.toString(j), " collide")
+                );
             }
         }
     }
@@ -110,23 +111,22 @@ contract ProtocolVectorsTest is Test {
         b[1] = a[1];
         b[2] = a[2];
 
-        assertTrue(this._callHashN(a) != this._callHashN(b),
-            "different tag must produce different hash");
+        assertTrue(this._callHashN(a) != this._callHashN(b), "different tag must produce different hash");
     }
 
     // ---- Print all 12 derived tag hex values (for gateway-side pinning) ----
     function test_print_tags() public {
         emit log_named_bytes32("NOTE_COMMITMENT_V1", Eip8182Tag.NOTE_COMMITMENT_V1());
-        emit log_named_bytes32("NOTE_BODY_V1",       Eip8182Tag.NOTE_BODY_V1());
-        emit log_named_bytes32("NULLIFIER_V1",       Eip8182Tag.NULLIFIER_V1());
-        emit log_named_bytes32("ACCOUNT_V1",         Eip8182Tag.ACCOUNT_V1());
-        emit log_named_bytes32("OWNER_V1",           Eip8182Tag.OWNER_V1());
-        emit log_named_bytes32("AMOUNT_V1",          Eip8182Tag.AMOUNT_V1());
-        emit log_named_bytes32("INTENT_V1",          Eip8182Tag.INTENT_V1());
-        emit log_named_bytes32("SPEND_V1",           Eip8182Tag.SPEND_V1());
-        emit log_named_bytes32("TAG_V1",             Eip8182Tag.TAG_V1());
-        emit log_named_bytes32("EXIT_V1",            Eip8182Tag.EXIT_V1());
-        emit log_named_bytes32("INGEST_V1",          Eip8182Tag.INGEST_V1());
-        emit log_named_bytes32("POLICY_V1",          Eip8182Tag.POLICY_V1());
+        emit log_named_bytes32("NOTE_BODY_V1", Eip8182Tag.NOTE_BODY_V1());
+        emit log_named_bytes32("NULLIFIER_V1", Eip8182Tag.NULLIFIER_V1());
+        emit log_named_bytes32("ACCOUNT_V1", Eip8182Tag.ACCOUNT_V1());
+        emit log_named_bytes32("OWNER_V1", Eip8182Tag.OWNER_V1());
+        emit log_named_bytes32("AMOUNT_V1", Eip8182Tag.AMOUNT_V1());
+        emit log_named_bytes32("INTENT_V1", Eip8182Tag.INTENT_V1());
+        emit log_named_bytes32("SPEND_V1", Eip8182Tag.SPEND_V1());
+        emit log_named_bytes32("TAG_V1", Eip8182Tag.TAG_V1());
+        emit log_named_bytes32("EXIT_V1", Eip8182Tag.EXIT_V1());
+        emit log_named_bytes32("INGEST_V1", Eip8182Tag.INGEST_V1());
+        emit log_named_bytes32("POLICY_V1", Eip8182Tag.POLICY_V1());
     }
 }

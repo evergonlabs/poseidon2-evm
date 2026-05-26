@@ -29,8 +29,7 @@ pragma solidity >=0.8.8;
 //   INGEST_V1          = 0x17ac7ba90c26b483c87cd8f751a22a8ca6da582599d8875161924bb92f759de6
 //   POLICY_V1          = 0x1582ec40895a9ad51f9cd5be516003275f845fb503b10beabf89737f05143026
 library Eip8182Tag {
-    uint256 internal constant PRIME =
-        0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001;
+    uint256 internal constant PRIME = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001;
     bytes9 internal constant PREFIX = "eip-8182.";
 
     function derive(string memory name) internal pure returns (bytes32) {
@@ -39,16 +38,51 @@ library Eip8182Tag {
     }
 
     // Convenience: the 12-tag protocol set from spec §2 / V4 §3.
-    function NOTE_COMMITMENT_V1() internal pure returns (bytes32) { return derive("note_commitment_v1"); }
-    function NOTE_BODY_V1()        internal pure returns (bytes32) { return derive("note_body_v1"); }
-    function NULLIFIER_V1()        internal pure returns (bytes32) { return derive("nullifier_v1"); }
-    function ACCOUNT_V1()          internal pure returns (bytes32) { return derive("account_v1"); }
-    function OWNER_V1()            internal pure returns (bytes32) { return derive("owner_v1"); }
-    function AMOUNT_V1()           internal pure returns (bytes32) { return derive("amount_v1"); }
-    function INTENT_V1()           internal pure returns (bytes32) { return derive("intent_v1"); }
-    function SPEND_V1()            internal pure returns (bytes32) { return derive("spend_v1"); }
-    function TAG_V1()              internal pure returns (bytes32) { return derive("tag_v1"); }
-    function EXIT_V1()             internal pure returns (bytes32) { return derive("exit_v1"); }
-    function INGEST_V1()           internal pure returns (bytes32) { return derive("ingest_v1"); }
-    function POLICY_V1()           internal pure returns (bytes32) { return derive("policy_v1"); }
+    function NOTE_COMMITMENT_V1() internal pure returns (bytes32) {
+        return derive("note_commitment_v1");
+    }
+
+    function NOTE_BODY_V1() internal pure returns (bytes32) {
+        return derive("note_body_v1");
+    }
+
+    function NULLIFIER_V1() internal pure returns (bytes32) {
+        return derive("nullifier_v1");
+    }
+
+    function ACCOUNT_V1() internal pure returns (bytes32) {
+        return derive("account_v1");
+    }
+
+    function OWNER_V1() internal pure returns (bytes32) {
+        return derive("owner_v1");
+    }
+
+    function AMOUNT_V1() internal pure returns (bytes32) {
+        return derive("amount_v1");
+    }
+
+    function INTENT_V1() internal pure returns (bytes32) {
+        return derive("intent_v1");
+    }
+
+    function SPEND_V1() internal pure returns (bytes32) {
+        return derive("spend_v1");
+    }
+
+    function TAG_V1() internal pure returns (bytes32) {
+        return derive("tag_v1");
+    }
+
+    function EXIT_V1() internal pure returns (bytes32) {
+        return derive("exit_v1");
+    }
+
+    function INGEST_V1() internal pure returns (bytes32) {
+        return derive("ingest_v1");
+    }
+
+    function POLICY_V1() internal pure returns (bytes32) {
+        return derive("policy_v1");
+    }
 }
