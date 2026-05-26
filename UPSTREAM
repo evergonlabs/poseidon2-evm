@@ -1,0 +1,54 @@
+# UPSTREAM
+
+This branch (`eip8182-sponge`) forks from:
+
+  repo:        zemse/poseidon2-evm
+  branch:      main
+  commit:      d3cca6811b215972ed7e5f83ece1247d0e87d354
+  short:       d3cca68
+  message:     Input sanitization (#3)
+  date:        2026-02-14
+  describe:    v1.0.0-27-gd3cca68 (27 commits past the v1.0.0 tag)
+
+## How to compare against upstream
+
+    git fetch upstream
+    git diff upstream/main..HEAD
+
+## How to rebase onto a future upstream release
+
+    git fetch upstream
+    git rebase upstream/main
+
+## Branch purpose
+
+Add an EIP-8182-conformant sponge wrapper over the upstream
+Poseidon2-BN254-t4 permutation primitive — exposing the `IPoseidon2`
+interface (`hash(left, right)` + `hashN(bytes32[] calldata)`) with
+length-tagged IV, domain-tag-as-input-0 prepending, and canonical-input
+rejection.
+
+Generic improvements only; **no consumer-specific code in this branch**
+(the motivating consumer is the iso20022-gateway ConfidentialOmnibusVault
+contract, but all changes here are upstream-compatible and could be
+proposed back to zemse/poseidon2-evm).
+
+## Atomic-commit roadmap
+
+  1. Expose state1..state3 from poseidon2_core (Yul generator)
+  2. Length-tagged-IV sponge construction (EIP-8182 §10)
+  3. hashN with domain-tag input-0 and arity-{0,1} guard (InvalidHashNArity)
+  4. Reject non-canonical inputs (>= p)
+  5. EIP-8182 normative test vectors
+  6. Per-arity protocol test vectors (2, 4, ..., ~17 for intentHash)
+  7. EXIT_V1 length-2 collision regression vector
+
+## Spec
+
+The implementation specification for the Poseidon2 hasher lives off-repo
+in the iso20022-gateway project's spec set (Poseidon2-hasher-spec.md).
+Ask the maintainer for the current location if needed.
+
+## License
+
+MIT — retained from upstream.
