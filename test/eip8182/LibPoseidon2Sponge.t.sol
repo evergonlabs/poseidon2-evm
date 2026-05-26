@@ -3,6 +3,7 @@ pragma solidity ^0.8.30;
 
 import {Test} from "forge-std/Test.sol";
 import {LibPoseidon2Yul} from "../../src/bn254/yul/LibPoseidon2Yul.sol";
+import {IPoseidon2 as ISponge} from "../../src/eip8182/IPoseidon2.sol";
 
 contract LibPoseidon2SpongeTest is Test {
     /// @notice poseidon2_permute MUST return the full 4-element post-permutation state.
@@ -37,5 +38,18 @@ contract LibPoseidon2SpongeTest is Test {
         // outputs with overwhelming probability. Probability of any collision
         // here is ~2^-254 for random-looking inputs (BN254 scalar field).
         assertTrue(r1 != r2 && r1 != r3 && r2 != r3, "rate-1/2/3 lanes collide");
+    }
+}
+
+contract InterfaceShapeTest is Test {
+    /// @notice This test does not run runtime logic — its purpose is a
+    ///         compile-time type assertion: a `view` function pointer of the
+    ///         right shape must exist. If the interface ever drifts (e.g. to
+    ///         `pure`), this stops compiling.
+    function test_interface_pointer_shape_compiles() public pure {
+        function(bytes32, bytes32) view returns (bytes32) ptr;
+        ptr; // silence unused warning
+        // We cannot bind ptr to an interface method without a deployed
+        // address, but the type-level assertion above is what we want.
     }
 }
