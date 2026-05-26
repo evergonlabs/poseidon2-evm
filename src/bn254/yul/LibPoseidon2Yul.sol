@@ -37,7 +37,8 @@ library LibPoseidon2Yul {
                 mstore(0, s2)
                 revert(0, 32)
             }
-            // IV (s3) is constructed internally as inputCount<<64 — always < PRIME.
+            // s3 (length-tagged IV inputCount<<64, or carried capacity from a prior
+            // permutation) is always < PRIME by construction — no canonical check.
 
             let state0 := s0
             let state1 := s1
@@ -2836,7 +2837,8 @@ library LibPoseidon2Yul {
                 mstore(0, s2)
                 revert(0, 32)
             }
-            // IV (s3) is constructed internally as inputCount<<64 — always < PRIME.
+            // s3 (length-tagged IV inputCount<<64, or carried capacity from a prior
+            // permutation) is always < PRIME by construction — no canonical check.
 
             let state0 := s0
             let state1 := s1

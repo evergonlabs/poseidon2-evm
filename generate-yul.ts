@@ -70,7 +70,8 @@ function poseidon2_core(s0: string, s1: string, s2: string, s3: string) {
     if iszero(lt(${s0}, PRIME)) { mstore(0, ${s0}) revert(0, 32) }
     if iszero(lt(${s1}, PRIME)) { mstore(0, ${s1}) revert(0, 32) }
     if iszero(lt(${s2}, PRIME)) { mstore(0, ${s2}) revert(0, 32) }
-    // IV (${s3}) is constructed internally as inputCount<<64 — always < PRIME.
+    // ${s3} (length-tagged IV inputCount<<64, or carried capacity from a prior
+    // permutation) is always < PRIME by construction — no canonical check.
 
     let state0 := ${s0}
     let state1 := ${s1}

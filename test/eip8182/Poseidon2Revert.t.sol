@@ -116,4 +116,22 @@ contract Poseidon2RevertTest is Test {
         uint256 result = poseidon2.hash_1(uint256(0).toField()).toUint256();
         assertTrue(result != 0, "Solidity hash_1(0) returned 0");
     }
+
+    function test_yul_PRIME_minus_1_does_not_revert() public view {
+        // PRIME - 1 is the largest canonical field element. Locks the upper
+        // boundary: if the guard were `iszero(lt(sN, sub(PRIME, 1)))` (off by
+        // one), this would revert.
+        uint256 result = poseidon2Yul.hash_1(Field.PRIME - 1);
+        assertTrue(result != 0, "hash_1(PRIME-1) returned 0");
+    }
+
+    function test_yulLib_PRIME_minus_1_does_not_revert() public view {
+        uint256 result = this._callYulLibHash1(Field.PRIME - 1);
+        assertTrue(result != 0, "yulLib hash_1(PRIME-1) returned 0");
+    }
+
+    function test_solidity_PRIME_minus_1_does_not_revert() public view {
+        uint256 result = this._callSolidityHash1(Field.PRIME - 1);
+        assertTrue(result != 0, "Solidity hash_1(PRIME-1) returned 0");
+    }
 }
