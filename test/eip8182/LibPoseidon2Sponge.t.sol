@@ -192,7 +192,9 @@ contract HashNMultiBlockTest is Test {
 
     function test_hashN_arity5_matches_reference() public view {
         bytes32[] memory inputs = new bytes32[](5);
-        for (uint256 i = 0; i < 5; i++) inputs[i] = bytes32(uint256(0xaa00 + i));
+        for (uint256 i = 0; i < 5; i++) {
+            inputs[i] = bytes32(uint256(0xaa00 + i));
+        }
         bytes32 expected = _reference(inputs);
         assertEq(this._callHashN(inputs), expected, "hashN arity-5 mismatch");
     }
@@ -200,14 +202,18 @@ contract HashNMultiBlockTest is Test {
     function test_hashN_arity6_matches_reference() public view {
         // Boundary: exactly two blocks, no zero-padding in the last block.
         bytes32[] memory inputs = new bytes32[](6);
-        for (uint256 i = 0; i < 6; i++) inputs[i] = bytes32(uint256(0xbb00 + i));
+        for (uint256 i = 0; i < 6; i++) {
+            inputs[i] = bytes32(uint256(0xbb00 + i));
+        }
         bytes32 expected = _reference(inputs);
         assertEq(this._callHashN(inputs), expected, "hashN arity-6 mismatch");
     }
 
     function test_hashN_arity10_matches_reference() public view {
         bytes32[] memory inputs = new bytes32[](10);
-        for (uint256 i = 0; i < 10; i++) inputs[i] = bytes32(uint256(i + 1));
+        for (uint256 i = 0; i < 10; i++) {
+            inputs[i] = bytes32(uint256(i + 1));
+        }
         bytes32 expected = _reference(inputs);
         assertEq(this._callHashN(inputs), expected, "hashN arity-10 mismatch");
     }
@@ -215,7 +221,9 @@ contract HashNMultiBlockTest is Test {
     function test_hashN_arity17_matches_reference() public view {
         // Worst-case intentHash arity per spec §7. ⌈17/3⌉ = 6 permutations.
         bytes32[] memory inputs = new bytes32[](17);
-        for (uint256 i = 0; i < 17; i++) inputs[i] = bytes32(uint256(0xdead00 + i));
+        for (uint256 i = 0; i < 17; i++) {
+            inputs[i] = bytes32(uint256(0xdead00 + i));
+        }
         bytes32 expected = _reference(inputs);
         assertEq(this._callHashN(inputs), expected, "hashN arity-17 mismatch");
     }
