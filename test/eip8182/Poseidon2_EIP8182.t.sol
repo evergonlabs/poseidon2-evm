@@ -69,3 +69,57 @@ contract Poseidon2EIP8182Test is Test {
         assertEq(highLevel, lowLevel, "high-level and low-level disagree");
     }
 }
+
+contract Poseidon2EIP8182GasTest is Test {
+    IPoseidon2 private hasher;
+
+    function setUp() public {
+        hasher = IPoseidon2(address(new Poseidon2_EIP8182()));
+    }
+
+    function test_gas_hash_treenode_staticcall() public {
+        // Warm the contract first to measure steady-state (non-cold) cost.
+        hasher.hash(bytes32(uint256(1)), bytes32(uint256(2)));
+
+        uint256 g0 = gasleft();
+        bytes32 result = hasher.hash(bytes32(uint256(3)), bytes32(uint256(4)));
+        uint256 spent = g0 - gasleft();
+        emit log_named_uint("hash(treenode) STATICCALL gas (warm)", spent);
+        assertTrue(result != bytes32(0), "sanity");
+    }
+
+    function test_gas_hashN_arity17_staticcall() public {
+        bytes32[] memory inputs = new bytes32[](17);
+        for (uint256 i = 0; i < 17; i++) {
+            inputs[i] = bytes32(uint256(0xa70 + i));
+        }
+
+        // Warm
+        hasher.hashN(inputs);
+
+        uint256 g0 = gasleft();
+        bytes32 result = hasher.hashN(inputs);
+        uint256 spent = g0 - gasleft();
+        emit log_named_uint("hashN(arity=17) STATICCALL gas (warm, 6 permutations)", spent);
+        assertTrue(result != bytes32(0), "sanity");
+    }
+
+    function test_gas_depth32_merkle_walk_estimate() public {
+        // Spec §7: depth-32 _insertLeaf does up to 32 hash() calls.
+        // Measure 32 sequential hash() calls to estimate the worst-case
+        // insert-path cost.
+        bytes32 acc = bytes32(uint256(1));
+        bytes32 sibling = bytes32(uint256(2));
+
+        // Warm
+        hasher.hash(acc, sibling);
+
+        uint256 g0 = gasleft();
+        for (uint256 d = 0; d < 32; d++) {
+            acc = hasher.hash(acc, sibling);
+        }
+        uint256 spent = g0 - gasleft();
+        emit log_named_uint("hash(treenode) STATICCALL x32 gas (depth-32 insertLeaf)", spent);
+        emit log_named_uint("per-hash average", spent / 32);
+    }
+}
