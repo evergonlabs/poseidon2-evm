@@ -1,13 +1,19 @@
 import { round_constant, internal_matrix_diagonal } from "../constants";
 import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 
-const JSON_PATH = "assets/eip-8182/poseidon2_bn254_t4_rf8_rp56.json";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const JSON_PATH = resolve(__dirname, "../assets/eip-8182/poseidon2_bn254_t4_rf8_rp56.json");
 const eip = JSON.parse(readFileSync(JSON_PATH, "utf8"));
 
 function normalize(x: string | bigint): bigint {
   if (typeof x === "bigint") return x;
   const trimmed = x.trim();
-  return trimmed.startsWith("0x") ? BigInt(trimmed) : BigInt(trimmed);
+  if (!trimmed.startsWith("0x")) {
+    throw new Error(`Expected 0x-prefixed hex string, got: ${trimmed}`);
+  }
+  return BigInt(trimmed);
 }
 
 const errors: string[] = [];
@@ -15,6 +21,9 @@ const errors: string[] = [];
 // --- Internal diagonal ---
 // JSON field: eip.internalDiagonal (string[], length 4)
 // constants.ts: internal_matrix_diagonal (string[], length 4)
+if (!Array.isArray(eip.internalDiagonal)) {
+  throw new Error("EIP-8182 JSON missing or malformed 'internalDiagonal' (expected string[])");
+}
 const eipDiag: string[] = eip.internalDiagonal;
 
 if (eipDiag.length !== internal_matrix_diagonal.length) {
@@ -49,6 +58,9 @@ for (let i = 0; i < Math.min(eipDiag.length, internal_matrix_diagonal.length); i
 //   - rows 4-59, slot [0] only (56 values)
 //   - rows 60-63 fully (16 values)
 
+if (!Array.isArray(eip.roundConstants)) {
+  throw new Error("EIP-8182 JSON missing or malformed 'roundConstants' (expected string[])");
+}
 const eipFlat: string[] = eip.roundConstants;
 
 function buildLocalFlat(): bigint[] {
@@ -59,7 +71,11 @@ function buildLocalFlat(): bigint[] {
       flat.push(normalize(round_constant[r][i]));
     }
   }
-  // 56 partial rounds — only first element per row
+  // 56 partial rounds — only first element per row.
+  // Slots [1], [2], [3] are 0 by construction: the Yul generator's
+  // internal_m_multiplication only reads round_constant[r][0] for partial
+  // rounds; the other slots are never addressed, so 0 is a deliberate
+  // semantic choice, not merely padding to fill a fixed-width matrix.
   for (let r = 4; r < 60; r++) {
     flat.push(normalize(round_constant[r][0]));
     // Verify the padding zeros are actually zero
