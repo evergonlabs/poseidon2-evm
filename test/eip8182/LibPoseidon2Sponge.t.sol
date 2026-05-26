@@ -3,7 +3,7 @@ pragma solidity ^0.8.30;
 
 import {Test} from "forge-std/Test.sol";
 import {LibPoseidon2Yul} from "../../src/bn254/yul/LibPoseidon2Yul.sol";
-import {IPoseidon2 as ISponge} from "../../src/eip8182/IPoseidon2.sol";
+import {IPoseidon2} from "../../src/eip8182/IPoseidon2.sol";
 
 contract LibPoseidon2SpongeTest is Test {
     /// @notice poseidon2_permute MUST return the full 4-element post-permutation state.
@@ -42,14 +42,18 @@ contract LibPoseidon2SpongeTest is Test {
 }
 
 contract InterfaceShapeTest is Test {
-    /// @notice This test does not run runtime logic — its purpose is a
-    ///         compile-time type assertion: a `view` function pointer of the
-    ///         right shape must exist. If the interface ever drifts (e.g. to
-    ///         `pure`), this stops compiling.
+    /// @notice Compile-time type assertion: the IPoseidon2.hash method MUST
+    ///         have the exact signature OpenZeppelin MerkleTree's custom-hasher
+    ///         pointer expects — `function(bytes32, bytes32) view returns (bytes32)`.
+    ///         If the interface ever drifts (e.g. narrowed to `pure`, or
+    ///         renamed, or arg types changed), this stops compiling.
     function test_interface_pointer_shape_compiles() public pure {
-        function(bytes32, bytes32) view returns (bytes32) ptr;
+        // Cannot bind to an interface method without a deployed address, so
+        // we use a typed reference to a hypothetical instance. The cast itself
+        // is the assertion: if IPoseidon2.hash isn't `function(bytes32,bytes32) external view returns (bytes32)`,
+        // this assignment fails to compile.
+        IPoseidon2 hasher = IPoseidon2(address(0));
+        function(bytes32, bytes32) external view returns (bytes32) ptr = hasher.hash;
         ptr; // silence unused warning
-        // We cannot bind ptr to an interface method without a deployed
-        // address, but the type-level assertion above is what we want.
     }
 }
