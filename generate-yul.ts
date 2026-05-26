@@ -36,6 +36,22 @@ library LibPoseidon2Yul {
             result := state0
         }
     }
+
+    /// @notice Full 4-element post-permutation state. Required for multi-block
+    ///         sponge absorbs (arity > 3). Spec §4 step 1.
+    function poseidon2_permute(uint256 s0, uint256 s1, uint256 s2, uint256 s3)
+        internal
+        pure
+        returns (uint256 r0, uint256 r1, uint256 r2, uint256 r3)
+    {
+        assembly {
+            ${poseidon2_core("s0", "s1", "s2", "s3")}
+            r0 := state0
+            r1 := state1
+            r2 := state2
+            r3 := state3
+        }
+    }
 }
 `;
 }
