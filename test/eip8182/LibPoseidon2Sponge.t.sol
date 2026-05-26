@@ -159,3 +159,101 @@ contract HashNSinglePermutationTest is Test {
         return LibPoseidon2Sponge.hashN(inputs);
     }
 }
+
+import {Field, LibPoseidon2} from "../../src/bn254/solidity/LibPoseidon2.sol";
+
+contract HashNMultiBlockTest is Test {
+    using Field for *;
+
+    /// @notice Reference helper: pure-Solidity LibPoseidon2 with EIP-8182-style
+    ///         absorb (is_variable_length=false). This IS the EIP-8182 §10
+    ///         construction — additive duplex, zero-padded short tail, length
+    ///         in the IV. The only difference from the optimized Yul path is
+    ///         speed (and that this reference reverts via Field.toField on
+    ///         non-canonical inputs, which is the same behavior we want).
+    function _reference(bytes32[] memory inputs) internal pure returns (bytes32) {
+        Field.Type[] memory casted = new Field.Type[](inputs.length);
+        for (uint256 i = 0; i < inputs.length; i++) {
+            casted[i] = uint256(inputs[i]).toField(); // reverts if >= PRIME
+        }
+        return bytes32(LibPoseidon2.hash(casted, inputs.length, false).toUint256());
+    }
+
+    function test_hashN_arity4_matches_reference() public view {
+        bytes32[] memory inputs = new bytes32[](4);
+        inputs[0] = bytes32(uint256(0x0891e9efa2b82224dccfee5171614168f84c4c99443c7e6e2753433a978f5955));
+        inputs[1] = bytes32(uint256(0x01c81114d1f4eb857dfe3a8479760fd0c8e33d9ed6f42f8ee3eef974b85ef937));
+        inputs[2] = bytes32(uint256(0x03a2238b91de1214a385af17ade25f2e71b6364b4d54dfb6e7ec96fd12be5a65));
+        inputs[3] = bytes32(uint256(0x24cc93df58f07c156dd648edac3318420325db58ff1cccbc3d9a3cdb529f8469));
+
+        bytes32 expected = _reference(inputs);
+        assertEq(this._callHashN(inputs), expected, "hashN arity-4 mismatch");
+    }
+
+    function test_hashN_arity5_matches_reference() public view {
+        bytes32[] memory inputs = new bytes32[](5);
+        for (uint256 i = 0; i < 5; i++) inputs[i] = bytes32(uint256(0xaa00 + i));
+        bytes32 expected = _reference(inputs);
+        assertEq(this._callHashN(inputs), expected, "hashN arity-5 mismatch");
+    }
+
+    function test_hashN_arity6_matches_reference() public view {
+        // Boundary: exactly two blocks, no zero-padding in the last block.
+        bytes32[] memory inputs = new bytes32[](6);
+        for (uint256 i = 0; i < 6; i++) inputs[i] = bytes32(uint256(0xbb00 + i));
+        bytes32 expected = _reference(inputs);
+        assertEq(this._callHashN(inputs), expected, "hashN arity-6 mismatch");
+    }
+
+    function test_hashN_arity10_matches_reference() public view {
+        bytes32[] memory inputs = new bytes32[](10);
+        for (uint256 i = 0; i < 10; i++) inputs[i] = bytes32(uint256(i + 1));
+        bytes32 expected = _reference(inputs);
+        assertEq(this._callHashN(inputs), expected, "hashN arity-10 mismatch");
+    }
+
+    function test_hashN_arity17_matches_reference() public view {
+        // Worst-case intentHash arity per spec §7. ⌈17/3⌉ = 6 permutations.
+        bytes32[] memory inputs = new bytes32[](17);
+        for (uint256 i = 0; i < 17; i++) inputs[i] = bytes32(uint256(0xdead00 + i));
+        bytes32 expected = _reference(inputs);
+        assertEq(this._callHashN(inputs), expected, "hashN arity-17 mismatch");
+    }
+
+    function test_hashN_arity4_reverts_on_non_canonical_middle_input() public {
+        bytes32[] memory inputs = new bytes32[](4);
+        inputs[0] = bytes32(uint256(1));
+        inputs[1] = bytes32(LibPoseidon2Sponge.PRIME() + 7);
+        inputs[2] = bytes32(uint256(3));
+        inputs[3] = bytes32(uint256(4));
+        vm.expectRevert();
+        this._callHashN(inputs);
+    }
+
+    function test_hashN_arity4_reverts_on_non_canonical_last_input() public {
+        bytes32[] memory inputs = new bytes32[](4);
+        inputs[0] = bytes32(uint256(1));
+        inputs[1] = bytes32(uint256(2));
+        inputs[2] = bytes32(uint256(3));
+        inputs[3] = bytes32(LibPoseidon2Sponge.PRIME());
+        vm.expectRevert();
+        this._callHashN(inputs);
+    }
+
+    /// @notice Fuzz: arity in [4, 32], all canonical inputs, must match the
+    ///         pure-Solidity reference for every shape and value.
+    function testFuzz_hashN_matches_reference(uint256[] memory raw) public view {
+        uint256 n = raw.length;
+        vm.assume(n >= 4 && n <= 32);
+        bytes32[] memory inputs = new bytes32[](n);
+        for (uint256 i = 0; i < n; i++) {
+            inputs[i] = bytes32(raw[i] % LibPoseidon2Sponge.PRIME());
+        }
+        bytes32 expected = _reference(inputs);
+        assertEq(this._callHashN(inputs), expected, "hashN != reference");
+    }
+
+    function _callHashN(bytes32[] calldata inputs) external pure returns (bytes32) {
+        return LibPoseidon2Sponge.hashN(inputs);
+    }
+}
