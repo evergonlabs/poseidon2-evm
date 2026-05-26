@@ -62,9 +62,7 @@ contract Poseidon2EIP8182Test is Test {
         bytes32 r = bytes32(uint256(7));
         bytes32 highLevel = hasher.hash(l, r);
 
-        (bool ok, bytes memory ret) = address(hasher).staticcall(
-            abi.encodeWithSelector(IPoseidon2.hash.selector, l, r)
-        );
+        (bool ok, bytes memory ret) = address(hasher).staticcall(abi.encodeWithSelector(IPoseidon2.hash.selector, l, r));
         assertTrue(ok, "low-level staticcall failed");
         assertEq(ret.length, 32, "unexpected return size");
         bytes32 lowLevel = abi.decode(ret, (bytes32));
