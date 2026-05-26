@@ -35,8 +35,9 @@ library LibPoseidon2Sponge {
     }
 
     /// @notice Fixed-arity domain-separated absorption.
-    /// @dev    inputs[0] is the *_V1 domain tag (caller-provided; not auto-
-    ///         prepended). For arity 2-3 this is a single permutation; for
+    /// @dev    inputs[0] is the caller-supplied domain tag (derived per
+    ///         EIP-8182 §10; not auto-prepended by this library). For arity
+    ///         2-3 this is a single permutation; for
     ///         arity > 3 it absorbs in rate-3 blocks with additive duplex
     ///         (state[i] += block[i]) between permutations. Spec §2.
     ///         Reverts InvalidHashNArity on arity {0, 1}.
