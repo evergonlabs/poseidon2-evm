@@ -7,9 +7,9 @@ import {Eip8182Tag} from "../../src/eip8182/Eip8182Tag.sol";
 import {Field, LibPoseidon2} from "../../src/bn254/solidity/LibPoseidon2.sol";
 
 /// @title Eip8182TagVectorsTest
-/// @notice Per-arity coverage from spec §7. These are internal-consistency
+/// @notice Per-arity coverage. These are internal-consistency
 ///         and structural-distinctness checks for the EIP-8182 sponge and the
-///         Eip8182Tag derivation primitive. Spec §2 / §7 / roadmap step 6.
+///         Eip8182Tag derivation primitive.
 contract Eip8182TagVectorsTest is Test {
     using Field for *;
 
@@ -103,7 +103,7 @@ contract Eip8182TagVectorsTest is Test {
         assertTrue(this._callHashN(a) != this._callHashN(b), "different tag must produce different hash");
     }
 
-    /// @notice Spec §7 — tagged vs untagged 2-input collision regression.
+    /// @notice Tagged vs untagged 2-input collision regression.
     ///
     ///         hash(bytes32(0x01), bytes32(0x02)) is the bare 2-input tree-node
     ///         hash. hashN([tag, bytes32(0x02)]) is a 2-input absorption where

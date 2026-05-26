@@ -7,11 +7,10 @@ import {Poseidon2Yul_BN254} from "../../src/bn254/yul/Poseidon2Yul.sol";
 import {LibPoseidon2Yul} from "../../src/bn254/yul/LibPoseidon2Yul.sol";
 import {IPoseidon2} from "../../src/IPoseidon2.sol";
 
-/// @notice Spec §2 / roadmap step 4 — every Yul + pure-Solidity hash entry
-///         point reverts on non-canonical inputs (>= PRIME). Silent mod-p
-///         would allow constructing (x, x+p) collisions. Huff retains
-///         upstream silent-mod behavior (spec §4: Huff is not extended in
-///         this fork) and is NOT exercised here.
+/// @notice Every Yul + pure-Solidity hash entry point reverts on non-canonical
+///         inputs (>= PRIME). Silent mod-p would allow constructing (x, x+p)
+///         collisions. Huff retains upstream silent-mod behavior (Huff is not
+///         extended in this fork) and is NOT exercised here.
 contract Poseidon2RevertTest is Test {
     using Field for *;
 

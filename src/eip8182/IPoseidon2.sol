@@ -11,18 +11,16 @@ pragma solidity >=0.8.8;
 ///         pointer signature is `function(bytes32,bytes32) view returns (bytes32)`;
 ///         a `pure` implementation satisfies `view`, but narrowing the interface
 ///         to `pure` breaks the pointer-type match. Do not narrow.
-///
-///         Spec: Poseidon2-hasher-spec.md §3.
 interface IPoseidon2 {
     /// @notice 2-input tree-node hash — the Merkle-tree compression.
-    /// @dev    Untagged absorption with IV = 2<<64 (spec §2). NOT a domain-
+    /// @dev    Untagged absorption with IV = 2<<64. NOT a domain-
     ///         separated hashN call; the IV-length-tag is what separates a
     ///         tree-node hash from any arity-≥3 application hash.
     function hash(bytes32 left, bytes32 right) external view returns (bytes32);
 
     /// @notice Fixed-arity, domain-separated absorption.
     /// @dev    inputs[0] MUST be the domain tag computed per EIP-8182 §10 as
-    ///         fieldElement(keccak256("eip-8182.<name>")) (spec §2).
+    ///         fieldElement(keccak256("eip-8182.<name>")).
     ///         Reverts InvalidHashNArity(length) on inputs.length == 0 or 1
     ///         (a tag with no payload is a misuse).
     ///         Reverts InvalidFieldElement(value) on any inputs[i] >= PRIME.
@@ -33,5 +31,5 @@ interface IPoseidon2 {
 error InvalidHashNArity(uint256 length);
 
 /// @notice Thrown when an input element is >= BN254 scalar field PRIME.
-///         Silent mod-p reduction is explicitly forbidden by the spec (§2).
+///         Silent mod-p reduction is forbidden — it would allow (x, x+p) collisions.
 error InvalidFieldElement(uint256 value);

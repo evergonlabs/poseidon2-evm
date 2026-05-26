@@ -3,7 +3,7 @@ pragma solidity >=0.8.8;
 
 /// @title Eip8182Tag
 /// @notice Derives EIP-8182 §10 domain tags as
-///         fieldElement(keccak256("eip-8182.<name>")). Spec §2.
+///         fieldElement(keccak256("eip-8182.<name>")).
 /// @dev    The reduction `% PRIME` ensures the tag is a canonical field
 ///         element (keccak256 output can exceed PRIME, though it almost never
 ///         does in practice; we reduce defensively).

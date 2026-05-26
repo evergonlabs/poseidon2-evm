@@ -201,10 +201,9 @@ contract Poseidon2Test is Test {
 
     // ============================================================
     // Input sanitization tests have moved.
-    // Task 3 (spec §2): Yul & pure-Solidity entry points now REVERT on
-    // inputs >= PRIME (no silent mod p). See test/eip8182/Poseidon2Revert.t.sol.
-    // Huff retains upstream silent-mod behavior — spec §4 says Huff is not
-    // extended in this fork.
+    // Yul & pure-Solidity entry points REVERT on inputs >= PRIME (no silent mod p;
+    // see commit history). See test/eip8182/Poseidon2Revert.t.sol.
+    // Huff retains upstream silent-mod behavior — Huff is not extended in this fork.
     // ============================================================
 
     // ============================================================

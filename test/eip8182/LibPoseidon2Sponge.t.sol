@@ -64,7 +64,7 @@ contract HashTreeNodeTest is Test {
     function test_hash_treenode_matches_zemse_hash2_vectors() public pure {
         // Same vectors as test/Poseidon2.t.sol::test_hash_2_vectors.
         // Tree-node hash is bare 2-input absorption with IV = 2<<64 — identical
-        // to upstream hash_2. Spec §2: "Per EIP-8182, Merkle tree-node hashes
+        // to upstream hash_2. "Per EIP-8182, Merkle tree-node hashes
         // are bare 2-input absorptions with IV = 2<<64 and no domain tag."
         bytes32 l = bytes32(uint256(0x1762d324c2db6a912e607fd09664aaa02dfe45b90711c0dae9627d62a4207788));
         bytes32 r = bytes32(uint256(0x1047bd52da536f6bdd26dfe642d25d9092c458e64a78211298648e81414cbf35));
@@ -219,7 +219,7 @@ contract HashNMultiBlockTest is Test {
     }
 
     function test_hashN_arity17_matches_reference() public view {
-        // Worst-case arity per spec §7. ⌈17/3⌉ = 6 permutations.
+        // Worst-case arity. ⌈17/3⌉ = 6 permutations.
         bytes32[] memory inputs = new bytes32[](17);
         for (uint256 i = 0; i < 17; i++) {
             inputs[i] = bytes32(uint256(0xdead00 + i));

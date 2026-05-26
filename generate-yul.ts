@@ -43,7 +43,7 @@ library LibPoseidon2Yul {
     }
 
     /// @notice Full 4-element post-permutation state. Required for multi-block
-    ///         sponge absorbs (arity > 3). Spec §4 step 1.
+    ///         sponge absorbs (arity > 3).
     function poseidon2_permute(uint256 s0, uint256 s1, uint256 s2, uint256 s3)
         internal
         pure
@@ -65,7 +65,7 @@ function poseidon2_core(s0: string, s1: string, s2: string, s3: string) {
   return `
     let PRIME := 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
 
-    // EIP-8182: reject non-canonical inputs. Spec §2 — silent mod p would
+    // EIP-8182: reject non-canonical inputs. Silent mod p would
     // let an attacker construct (x, x+p) collisions.
     if iszero(lt(${s0}, PRIME)) { mstore(0, ${s0}) revert(0, 32) }
     if iszero(lt(${s1}, PRIME)) { mstore(0, ${s1}) revert(0, 32) }

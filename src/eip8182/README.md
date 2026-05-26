@@ -49,4 +49,4 @@ For production deployment the artifacts in this directory should be pinned to
 a specific EIP-8182 commit and bound to the in-circuit Poseidon2 gadget against
 the test-vector set. A consuming protocol's binding ceremony should pin the
 EIP-8182 commit, audit the artifact unchanged, and verify the on-chain constants
-match the JSON byte-for-byte. See the off-repo spec §6 / §4 for the obligations.
+match the JSON byte-for-byte. Constants must be byte-equivalent to the pinned EIP-8182 JSON; the artifact should be audited unchanged before any production deployment.

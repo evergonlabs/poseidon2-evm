@@ -51,7 +51,7 @@ The implementation spec for this hasher is `Poseidon2-hasher-spec.md`, kept **of
 - The tagged-vs-untagged length-2 regression vector and per-arity test surface.
 - The pin-and-audit obligations for production deployment.
 
-**Do not duplicate the spec into the repo.** Reference it by section (`spec §2`, `spec §3`) in commit messages and PR descriptions. Code comments may reference durable artifacts (EIP-8182, the upstream `zemse/poseidon2-evm` repo, the test-vector JSON files once pinned in-repo), but should not point to off-repo spec paths.
+**Specs and plans are workflow artifacts — code, comments, and README files must NEVER reference them.** Cite spec sections (`spec §2`, `Task 3`, `roadmap step 5`, etc.) only in commit messages and PR descriptions. Source code stands on its own: substantive explanations inline; references only to durable external artifacts (EIP-8182, the upstream `zemse/poseidon2-evm` repo, pinned in-repo test-vector JSON files, OpenZeppelin libraries by name). If a comment's *only* content is a spec/plan citation, replace the citation with the substantive technical explanation it points to.
 
 ## Locked decisions (do not relitigate without a spec update)
 

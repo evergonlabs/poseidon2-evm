@@ -8,7 +8,6 @@ import {InvalidHashNArity} from "../../src/eip8182/IPoseidon2.sol";
 /// @title Eip8182VectorsTest
 /// @notice Walks every supported vector in assets/eip-8182/poseidon2_vectors.json
 ///         and asserts the sponge wrapper reproduces each one byte-for-byte.
-///         Spec §1. UPSTREAM roadmap step 5.
 ///
 /// @dev    The JSON is pinned to a specific EIP-8182 commit recorded in
 ///         assets/eip-8182/EIP-8182-COMMIT. If the EIP-8182 draft is amended
@@ -23,7 +22,7 @@ import {InvalidHashNArity} from "../../src/eip8182/IPoseidon2.sol";
 ///             ]
 ///           }
 ///         9 vectors total; arities: 0, 1, 2, 3, 4, 5, 6, 17, 116.
-///         Arities 0 and 1 are excluded — per spec (Tasks 6–7), hashN reverts
+///         Arities 0 and 1 are excluded — hashN reverts
 ///         on InvalidHashNArity for n < 2, matching EIP-8182 §3 which defines
 ///         the hash only for n >= 2.
 contract Eip8182VectorsTest is Test {
@@ -53,7 +52,7 @@ contract Eip8182VectorsTest is Test {
             bytes32[] memory inputs = allInputs[i];
             uint256 arity = inputs.length;
 
-            // EIP-8182 supports arity 0/1; spec §3 deliberately rejects them in
+            // EIP-8182 supports arity 0/1; this library deliberately rejects them in
             // our hashN (a domain tag with no payload is a misuse). Assert the
             // rejection here so a future regression that loosens the arity guard
             // is caught.

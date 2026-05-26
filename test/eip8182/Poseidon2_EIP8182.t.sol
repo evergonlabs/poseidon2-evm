@@ -105,7 +105,7 @@ contract Poseidon2EIP8182GasTest is Test {
     }
 
     function test_gas_depth32_merkle_walk_estimate() public {
-        // Spec §7: depth-32 _insertLeaf does up to 32 hash() calls.
+        // depth-32 _insertLeaf does up to 32 hash() calls.
         // Measure 32 sequential hash() calls to estimate the worst-case
         // insert-path cost.
         bytes32 acc = bytes32(uint256(1));
