@@ -121,5 +121,6 @@ contract Poseidon2EIP8182GasTest is Test {
         uint256 spent = g0 - gasleft();
         emit log_named_uint("hash(treenode) STATICCALL x32 gas (depth-32 insertLeaf)", spent);
         emit log_named_uint("per-hash average", spent / 32);
+        assertTrue(acc != bytes32(0), "sanity");
     }
 }
