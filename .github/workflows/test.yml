@@ -24,11 +24,15 @@ jobs:
         with:
           node-version: '20'
 
-      # Toolchains are pinned (not `nightly`) so the gas snapshot is
-      # reproducible: an unpinned nightly huffc/forge drifts and breaks the
-      # gas `diff` on unrelated PRs. The Solidity/Yul gas is fixed by the
-      # pinned solc in foundry.toml; the Huff gas tracks the huffc version,
-      # hence the explicit huffc pin below.
+      # Foundry is pinned to `stable` so the gas snapshot is reproducible: the
+      # Solidity/Yul gas numbers are fixed by the pinned solc in foundry.toml
+      # plus the cancun opcode schedule (the forge version doesn't change them).
+      # huffc stays `nightly` because this action only publishes nightly assets
+      # (pinning a release tag like 0.3.2 404s); huffc is needed solely to
+      # compile the Huff *test* contract, whose hash-vector assertions are
+      # version-independent. Only Huff *gas* tracks the huffc version, and the
+      # snapshot deliberately EXCLUDES Huff (see gas-report.sh) so the floating
+      # huffc never breaks the gas diff.
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
@@ -37,7 +41,7 @@ jobs:
       - name: Install Huff
         uses: huff-language/huff-toolchain@v3
         with:
-          version: 0.3.2
+          version: nightly
 
       - name: Check formatting
         run: forge fmt --check
