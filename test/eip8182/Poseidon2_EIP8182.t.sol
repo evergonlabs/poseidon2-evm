@@ -2,7 +2,7 @@
 pragma solidity ^0.8.30;
 
 import {Test} from "forge-std/Test.sol";
-import {IPoseidon2, InvalidHashNArity} from "../../src/eip8182/IPoseidon2.sol";
+import {IPoseidon2, InvalidHashNArity, InvalidFieldElement} from "../../src/eip8182/IPoseidon2.sol";
 import {Poseidon2_EIP8182} from "../../src/eip8182/Poseidon2_EIP8182.sol";
 
 contract Poseidon2EIP8182Test is Test {
@@ -38,8 +38,9 @@ contract Poseidon2EIP8182Test is Test {
 
     function test_hash_non_canonical_reverts_via_staticcall() public {
         // PRIME itself is non-canonical.
-        bytes32 nonCanon = bytes32(uint256(0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001));
-        vm.expectRevert();
+        uint256 prime = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001;
+        bytes32 nonCanon = bytes32(prime);
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, prime));
         hasher.hash(nonCanon, bytes32(uint256(1)));
     }
 

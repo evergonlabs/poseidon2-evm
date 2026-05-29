@@ -108,8 +108,11 @@ library LibPoseidon2Sponge {
                 st2 := addmod(st2, b2, PRIME_)
             }
 
-            // Permute. After addmod, st0..st2 are canonical, so the inherited
-            // canonical check in poseidon2_permute is a no-op (a sanity guard).
+            // Permute. After addmod, st0..st2 are canonical (poseidon2_permute's
+            // inherited guard on the rate lanes is a no-op here). st3 (capacity) is
+            // not range-checked by poseidon2_permute, which is safe: it starts as the
+            // IV (< PRIME) and is thereafter always a permutation output (addmod/mulmod
+            // reduced), so it stays canonical across blocks.
             (st0, st1, st2, st3) = LibPoseidon2Yul.poseidon2_permute(st0, st1, st2, st3);
 
             i += 3;

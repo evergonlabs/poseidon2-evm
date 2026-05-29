@@ -35,6 +35,10 @@ contract Eip8182VectorsTest is Test {
     function test_eip8182_normative_vectors() public {
         string memory raw = vm.readFile("assets/eip-8182/poseidon2_vectors.json");
 
+        // Guard against accidentally loading a vector file for a different field.
+        uint256 fieldModulus = abi.decode(vm.parseJson(raw, ".fieldModulus"), (uint256));
+        assertEq(fieldModulus, LibPoseidon2Sponge.PRIME(), "vector file is for a different field");
+
         // Parse the poseidonVectors array from the JSON.
         // Each entry has an `inputs` sub-array and an `output` scalar — all
         // values are 0x-prefixed 32-byte hex strings (auto-decoded as bytes32).

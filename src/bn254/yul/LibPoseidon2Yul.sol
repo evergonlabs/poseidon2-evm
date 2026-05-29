@@ -25,17 +25,21 @@ library LibPoseidon2Yul {
 
             // EIP-8182: reject non-canonical inputs. Silent mod p would
             // let an attacker construct (x, x+p) collisions.
+            // Reverts InvalidFieldElement(uint256) — selector 0xd53e9415.
             if iszero(lt(s0, PRIME)) {
-                mstore(0, s0)
-                revert(0, 32)
+                mstore(0x00, shl(224, 0xd53e9415))
+                mstore(0x04, s0)
+                revert(0x00, 0x24)
             }
             if iszero(lt(s1, PRIME)) {
-                mstore(0, s1)
-                revert(0, 32)
+                mstore(0x00, shl(224, 0xd53e9415))
+                mstore(0x04, s1)
+                revert(0x00, 0x24)
             }
             if iszero(lt(s2, PRIME)) {
-                mstore(0, s2)
-                revert(0, 32)
+                mstore(0x00, shl(224, 0xd53e9415))
+                mstore(0x04, s2)
+                revert(0x00, 0x24)
             }
             // s3 (length-tagged IV inputCount<<64, or carried capacity from a prior
             // permutation) is always < PRIME by construction — no canonical check.
@@ -2825,17 +2829,21 @@ library LibPoseidon2Yul {
 
             // EIP-8182: reject non-canonical inputs. Silent mod p would
             // let an attacker construct (x, x+p) collisions.
+            // Reverts InvalidFieldElement(uint256) — selector 0xd53e9415.
             if iszero(lt(s0, PRIME)) {
-                mstore(0, s0)
-                revert(0, 32)
+                mstore(0x00, shl(224, 0xd53e9415))
+                mstore(0x04, s0)
+                revert(0x00, 0x24)
             }
             if iszero(lt(s1, PRIME)) {
-                mstore(0, s1)
-                revert(0, 32)
+                mstore(0x00, shl(224, 0xd53e9415))
+                mstore(0x04, s1)
+                revert(0x00, 0x24)
             }
             if iszero(lt(s2, PRIME)) {
-                mstore(0, s2)
-                revert(0, 32)
+                mstore(0x00, shl(224, 0xd53e9415))
+                mstore(0x04, s2)
+                revert(0x00, 0x24)
             }
             // s3 (length-tagged IV inputCount<<64, or carried capacity from a prior
             // permutation) is always < PRIME by construction — no canonical check.

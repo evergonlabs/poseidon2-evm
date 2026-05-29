@@ -24,9 +24,11 @@ EIP-8182-conformant Poseidon2-BN254-t4 sponge over the upstream
   `src/IPoseidon2.sol`. The interface is `view` (matches OZ `MerkleTree`'s
   custom-hasher pointer signature); the upstream interface exposes
   `hash_1/2/3` and is unaffected.
-- **Multi-block sponge** via `LibPoseidon2Sponge.hashN` for arity > 3, using
-  the additive duplex absorb already present in `src/bn254/solidity/LibPoseidon2.sol`
-  but without the trailing-1 variable-length pad (length lives in the IV instead).
+- **Multi-block sponge** via `LibPoseidon2Sponge.hashN` for arity > 3: a rate-3
+  additive-duplex absorb built on `LibPoseidon2Yul.poseidon2_permute`, with a
+  zero-padded short tail and the length carried in the IV (no trailing-1
+  variable-length pad). The same construction is cross-checked in tests against
+  the pure-Solidity `LibPoseidon2` reference (called with `is_variable_length = false`).
 
 ## Files
 

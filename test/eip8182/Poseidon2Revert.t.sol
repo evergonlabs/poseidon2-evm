@@ -6,6 +6,7 @@ import {Field, Poseidon2_BN254, LibPoseidon2} from "../../src/bn254/solidity/Pos
 import {Poseidon2Yul_BN254} from "../../src/bn254/yul/Poseidon2Yul.sol";
 import {LibPoseidon2Yul} from "../../src/bn254/yul/LibPoseidon2Yul.sol";
 import {IPoseidon2} from "../../src/IPoseidon2.sol";
+import {InvalidFieldElement} from "../../src/eip8182/IPoseidon2.sol";
 
 /// @notice Every Yul + pure-Solidity hash entry point reverts on non-canonical
 ///         inputs (>= PRIME). Silent mod-p would allow constructing (x, x+p)
@@ -25,32 +26,32 @@ contract Poseidon2RevertTest is Test {
     // ---- Yul contract / fallback ----
 
     function test_yul_hash_1_reverts_on_PRIME() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, Field.PRIME));
         poseidon2Yul.hash_1(Field.PRIME);
     }
 
     function test_yul_hash_1_reverts_on_PRIME_plus_5() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, Field.PRIME + 5));
         poseidon2Yul.hash_1(Field.PRIME + 5);
     }
 
     function test_yul_hash_1_reverts_on_uint256_max() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, type(uint256).max));
         poseidon2Yul.hash_1(type(uint256).max);
     }
 
     function test_yul_hash_2_reverts_on_non_canonical_left() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, Field.PRIME));
         poseidon2Yul.hash_2(Field.PRIME, uint256(1));
     }
 
     function test_yul_hash_2_reverts_on_non_canonical_right() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, Field.PRIME));
         poseidon2Yul.hash_2(uint256(1), Field.PRIME);
     }
 
     function test_yul_hash_3_reverts_on_non_canonical_third() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, Field.PRIME + 7));
         poseidon2Yul.hash_3(uint256(1), uint256(2), Field.PRIME + 7);
     }
 
@@ -72,12 +73,12 @@ contract Poseidon2RevertTest is Test {
     }
 
     function test_yulLib_hash_1_reverts_on_PRIME() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, Field.PRIME));
         this._callYulLibHash1(Field.PRIME);
     }
 
     function test_yulLib_poseidon2_permute_reverts_on_non_canonical_s2() public {
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidFieldElement.selector, Field.PRIME + 1));
         this._callYulLibPermute(uint256(1), uint256(2), Field.PRIME + 1, 4 << 64);
     }
 
