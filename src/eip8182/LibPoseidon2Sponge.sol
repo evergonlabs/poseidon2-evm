@@ -26,7 +26,7 @@ library LibPoseidon2Sponge {
             l := left
             r := right
         }
-        uint256 result = LibPoseidon2Yul.poseidon2_core(l, r, 0, 2 << 64);
+        (uint256 result,,,) = LibPoseidon2Yul.poseidon2_permute(l, r, 0, 2 << 64);
         bytes32 out;
         assembly {
             out := result
@@ -61,7 +61,8 @@ library LibPoseidon2Sponge {
                 if gt(n, 1) { s1_ := calldataload(add(inputs.offset, 0x20)) }
                 if gt(n, 2) { s2_ := calldataload(add(inputs.offset, 0x40)) }
             }
-            return bytes32(LibPoseidon2Yul.poseidon2_core(s0_, s1_, s2_, iv));
+            (uint256 r0,,,) = LibPoseidon2Yul.poseidon2_permute(s0_, s1_, s2_, iv);
+            return bytes32(r0);
         }
 
         // Multi-block additive-duplex absorb (arity > 3). Initial state =
