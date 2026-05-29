@@ -24,15 +24,20 @@ jobs:
         with:
           node-version: '20'
 
+      # Toolchains are pinned (not `nightly`) so the gas snapshot is
+      # reproducible: an unpinned nightly huffc/forge drifts and breaks the
+      # gas `diff` on unrelated PRs. The Solidity/Yul gas is fixed by the
+      # pinned solc in foundry.toml; the Huff gas tracks the huffc version,
+      # hence the explicit huffc pin below.
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
+          version: stable
 
       - name: Install Huff
         uses: huff-language/huff-toolchain@v3
         with:
-          version: nightly
+          version: 0.3.2
 
       - name: Check formatting
         run: forge fmt --check
@@ -60,3 +65,13 @@ jobs:
           ./gas-report.sh
           diff gas-report.expected gas-report
         id: gas
+
+      # Always publish the freshly generated report so that, after a
+      # deliberate gas change, the new baseline can be downloaded from the run
+      # and committed verbatim (no local Linux/Huff needed to re-baseline).
+      - name: Upload regenerated gas report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gas-report
+          path: gas-report
