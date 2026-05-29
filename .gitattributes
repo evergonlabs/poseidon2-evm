@@ -1,0 +1,8 @@
+# Normalize line endings to LF in the repository and the working tree on all
+# platforms. Without this, `core.autocrlf=true` on Windows rewrites checked-out
+# source files to CRLF, which breaks `forge fmt --check` locally and risks
+# committing CRLF. git auto-detects binary files and leaves them untouched.
+* text=auto eol=lf
+
+# Shell scripts are executed on Linux/CI — must stay LF regardless.
+*.sh text eol=lf
