@@ -22,7 +22,9 @@ Details and design notes: [`src/eip8182/README.md`](src/eip8182/README.md).
 
 ## Installation
 
-Consumed as a pinned git dependency (no registry publish required):
+Pin to an immutable tag or commit — this is a cryptographic primitive whose output must stay fixed. Imports resolve from the package's `src/` (zero transitive Solidity dependencies).
+
+**Git dependency** (no registry needed):
 
 ```bash
 # npm / yarn (Hardhat, etc.)
@@ -32,7 +34,18 @@ npm install github:evergonlabs/poseidon2-evm#<tag-or-commit>
 forge install evergonlabs/poseidon2-evm@<tag-or-commit>
 ```
 
-Pin to an immutable tag or commit — this is a cryptographic primitive whose output must stay fixed. Imports resolve from the package's `src/` (zero transitive Solidity dependencies).
+**GitHub Packages registry** (`@evergonlabs` scope). GitHub Packages requires authentication to install — even for public packages — so add to your project's `.npmrc`:
+
+```
+@evergonlabs:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+then:
+
+```bash
+npm install @evergonlabs/poseidon2-evm
+```
 
 ## Usage
 

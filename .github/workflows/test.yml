@@ -23,6 +23,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
+
+      # Install pinned Node devDeps (tsx) so the generator and constants check
+      # resolve them from the lockfile rather than fetching per run.
+      - name: Install Node dependencies
+        run: npm ci
 
       # Foundry is pinned to `stable` so the gas snapshot is reproducible: the
       # Solidity/Yul gas numbers are fixed by the pinned solc in foundry.toml
