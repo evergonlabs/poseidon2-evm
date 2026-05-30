@@ -38,7 +38,7 @@ contract Eip8182TagVectorsTest is Test {
     // ---- Arity 2 tagged: example tag in slot 0 ----
     function test_protocol_arity2_with_example_tag() public view {
         bytes32[] memory inputs = new bytes32[](2);
-        inputs[0] = Eip8182Tag.EXAMPLE_NULLIFIER_V1();
+        inputs[0] = Eip8182Tag.derive("test_nullifier");
         inputs[1] = bytes32(uint256(uint160(0x000000000000000000000000000000000000C0FFEE)));
         assertEq(this._callHashN(inputs), _reference(inputs), "tagged arity-2 matches reference");
     }
@@ -46,17 +46,17 @@ contract Eip8182TagVectorsTest is Test {
     // ---- Arity 4 tagged with example commitment tag ----
     function test_protocol_arity4_with_example_commitment_tag() public view {
         bytes32[] memory inputs = new bytes32[](4);
-        inputs[0] = Eip8182Tag.EXAMPLE_COMMITMENT_V1();
+        inputs[0] = Eip8182Tag.derive("test_commitment");
         inputs[1] = bytes32(uint256(0xfeed01)); // field A
         inputs[2] = bytes32(uint256(7)); // counter
         inputs[3] = bytes32(uint256(0xfeed02)); // salt
-        assertEq(this._callHashN(inputs), _reference(inputs), "EXAMPLE_COMMITMENT_V1(arity4) matches reference");
+        assertEq(this._callHashN(inputs), _reference(inputs), "tagged arity-4 matches reference");
     }
 
     // ---- Arity 10 — longer payload + tag ----
     function test_protocol_arity10_with_tag() public view {
         bytes32[] memory inputs = new bytes32[](10);
-        inputs[0] = Eip8182Tag.EXAMPLE_COMMITMENT_V1();
+        inputs[0] = Eip8182Tag.derive("test_commitment");
         for (uint256 i = 1; i < 10; i++) {
             inputs[i] = bytes32(uint256(0xb0d0 + i));
         }
@@ -91,12 +91,12 @@ contract Eip8182TagVectorsTest is Test {
     // ---- Cross-tag distinctness: same payload, different tag → different hash ----
     function test_same_payload_different_tag_different_hash() public view {
         bytes32[] memory a = new bytes32[](3);
-        a[0] = Eip8182Tag.EXAMPLE_NULLIFIER_V1();
+        a[0] = Eip8182Tag.derive("test_nullifier");
         a[1] = bytes32(uint256(0xdead));
         a[2] = bytes32(uint256(0xbeef));
 
         bytes32[] memory b = new bytes32[](3);
-        b[0] = Eip8182Tag.EXAMPLE_COMMITMENT_V1();
+        b[0] = Eip8182Tag.derive("test_commitment");
         b[1] = a[1];
         b[2] = a[2];
 
@@ -116,17 +116,17 @@ contract Eip8182TagVectorsTest is Test {
         bytes32 viaHash = LibPoseidon2Sponge.hash(bytes32(uint256(0x01)), bytes32(uint256(0x02)));
 
         bytes32[] memory inputs = new bytes32[](2);
-        inputs[0] = Eip8182Tag.EXAMPLE_NULLIFIER_V1();
+        inputs[0] = Eip8182Tag.derive("test_nullifier");
         inputs[1] = bytes32(uint256(0x02));
         bytes32 viaHashN = this._callHashN(inputs);
 
         assertTrue(viaHash != viaHashN, "tagged length-2 collision: structural lock broken");
     }
 
-    // ---- Print example tags and a custom derivation (derivation demo) ----
+    // ---- Print a few derived tags (derivation demo) ----
     function test_print_tags() public {
-        emit log_named_bytes32("EXAMPLE_COMMITMENT_V1", Eip8182Tag.EXAMPLE_COMMITMENT_V1());
-        emit log_named_bytes32("EXAMPLE_NULLIFIER_V1", Eip8182Tag.EXAMPLE_NULLIFIER_V1());
+        emit log_named_bytes32("derive(note_commitment)", Eip8182Tag.derive("note_commitment"));
+        emit log_named_bytes32("derive(nullifier)", Eip8182Tag.derive("nullifier"));
         emit log_named_bytes32("derive(custom_name_v1)", Eip8182Tag.derive("custom_name_v1"));
     }
 }

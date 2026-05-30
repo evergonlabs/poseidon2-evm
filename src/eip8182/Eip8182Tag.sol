@@ -13,8 +13,7 @@ pragma solidity >=0.8.8;
 ///         A consumer picks its own `<name>` strings (one per logical hash
 ///         domain) and MUST keep the on-chain and in-circuit derivations on
 ///         identical strings. EIP-8182's own context names (§3.1 table, e.g.
-///         "note_commitment", "nullifier") carry no version suffix; the
-///         examples below are illustrative and are NOT EIP-8182 context names.
+///         "note_commitment", "nullifier") carry no version suffix.
 library Eip8182Tag {
     uint256 internal constant PRIME = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001;
     bytes9 internal constant PREFIX = "eip-8182.";
@@ -22,20 +21,5 @@ library Eip8182Tag {
     function derive(string memory name) internal pure returns (bytes32) {
         bytes32 h = keccak256(abi.encodePacked(PREFIX, bytes(name)));
         return bytes32(uint256(h) % PRIME);
-    }
-
-    // ----------------------------------------------------------------
-    // Illustrative examples. Not part of EIP-8182 — pick your own
-    // <name> strings in the consuming protocol.
-    // ----------------------------------------------------------------
-
-    /// @notice Example: a tag for a generic 4-input commitment hash.
-    function EXAMPLE_COMMITMENT_V1() internal pure returns (bytes32) {
-        return derive("example_commitment_v1");
-    }
-
-    /// @notice Example: a tag for a generic single-input nullifier-style hash.
-    function EXAMPLE_NULLIFIER_V1() internal pure returns (bytes32) {
-        return derive("example_nullifier_v1");
     }
 }
