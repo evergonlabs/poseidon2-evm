@@ -27,10 +27,14 @@
     "Soham Zemse (https://github.com/zemse)"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "src"
   ],
   "devDependencies": {
-    "prettier": "^3.8.1"
+    "prettier": "^3.8.1",
+    "tsx": "^4.22.3"
   }
 }

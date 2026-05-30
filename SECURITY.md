@@ -2,9 +2,22 @@
 
 ## Audit status
 
-**Not audited.** The implementations in this repository have not undergone a
-formal third-party security audit. Review the code, and verify the constants
-and test vectors against your in-circuit gadget, before any production use.
+**Not audited. Use at your own risk.**
+
+The implementations in this repository have **not** undergone a formal
+third-party security audit, and neither has the upstream
+[`zemse/poseidon2-evm`](https://github.com/zemse/poseidon2-evm) project this
+fork builds on. They are provided "as is", without warranty of any kind (see
+[LICENSE](LICENSE)).
+
+This is a cryptographic primitive: a single wrong bit in a hash output is a
+protocol break, and a bug can compromise every commitment, nullifier, and
+Merkle root derived from it. Before any production use:
+
+- Review the code, or commission an independent audit.
+- Verify that the pinned constants and normative test vectors reproduce the
+  exact output of your in-circuit Poseidon2 gadget.
+- Pin to an immutable tag or commit, and re-verify after any update.
 
 ## Reporting a vulnerability
 

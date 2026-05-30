@@ -102,7 +102,9 @@ Generated files (`src/bn254/yul/*`) are committed; edit the generator, not the o
 
 ## Security
 
-**Not audited.** These implementations have not undergone a formal third-party security audit. Review the code and confirm the constants/vectors against your in-circuit gadget before any production use. See [SECURITY.md](SECURITY.md).
+**Not audited — use at your own risk.**
+
+Neither this fork nor the upstream `zemse/poseidon2-evm` it builds on has undergone a formal third-party security audit. This is a cryptographic primitive: a single wrong bit in a hash output is a protocol break, and a bug can compromise every commitment, nullifier, and Merkle root derived from it. Before any production use, review the code (or commission an audit), verify the pinned constants and test vectors reproduce your in-circuit Poseidon2 gadget's output exactly, and pin to an immutable tag/commit. See [SECURITY.md](SECURITY.md).
 
 ## License
 
