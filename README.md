@@ -70,6 +70,22 @@ contract MyApp {
 
 The `poseidon2.hash` view function can be passed directly as the custom hasher to OpenZeppelin's `MerkleTree` library (its pointer type is exactly `function(bytes32,bytes32) view returns (bytes32)`).
 
+### Deploying from the precompiled artifact
+
+The published package includes a deploy artifact, `@evergonlabs/poseidon2-evm/artifacts/Poseidon2_EIP8182.json` (`{ abi, bytecode, deployedBytecode }`), built with this repo's pinned solc / optimizer settings. Deploy the singleton from it **without recompiling the Solidity** — so the on-chain bytecode is exactly the one built and tested here, and you avoid per-file compiler overrides in your project. For example with viem:
+
+```ts
+import artifact from "@evergonlabs/poseidon2-evm/artifacts/Poseidon2_EIP8182.json"; // tsconfig: resolveJsonModule
+
+const hash = await walletClient.deployContract({
+  abi: artifact.abi,
+  bytecode: artifact.bytecode as `0x${string}`,
+});
+// deploy once per chain, record the address, pass it to your consumer's constructor
+```
+
+Your own contracts still import only the interface source (`IPoseidon2.sol`) for compile-time typing — a bare interface, so it needs no compiler overrides.
+
 > For callers that want the bare permutation rather than the sponge, the Yul library [`src/bn254/yul/LibPoseidon2Yul.sol`](src/bn254/yul/LibPoseidon2Yul.sol) exposes the upstream `hash_1/2/3` entry points (inlinable; no deployed contract needed).
 
 ## Gas
@@ -96,9 +112,12 @@ forge fmt                   # format Solidity
 ./gas-report.sh             # regenerate the gas snapshot (requires huffc)
 npm run verify:constants    # byte-check constants.ts against the pinned EIP-8182 JSON
 npm run generate:yul        # regenerate the Yul from generate-yul.ts (then forge fmt)
+npm run build:artifacts     # forge build + extract artifacts/Poseidon2_EIP8182.json
 ```
 
 Generated files (`src/bn254/yul/*`) are committed; edit the generator, not the output. CI pins the toolchain and gates on build, tests, formatting, generated-file sync, and the gas snapshot.
+
+**Publishing (maintainers).** The deploy artifact is generated at publish time, not committed: run `npm run build:artifacts` (which builds with the pinned settings and writes `artifacts/`, gitignored), then publish. The artifact ships via the package `files` field. (A committed, CI-gated artifact is the production-time upgrade, once the bytecode is frozen for audit.)
 
 ## Security
 

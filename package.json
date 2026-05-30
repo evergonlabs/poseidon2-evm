@@ -12,7 +12,8 @@
     "generate:yul": "npx tsx generate-yul.ts && forge fmt",
     "generate:huff": "npx tsx generate-huff.ts",
     "generate:gas-report": "./gas-report.sh",
-    "verify:constants": "npx tsx scripts/verify-constants.ts"
+    "verify:constants": "npx tsx scripts/verify-constants.ts",
+    "build:artifacts": "forge build && npx tsx scripts/build-artifacts.ts"
   },
   "keywords": [
     "solidity",
@@ -38,7 +39,8 @@
   },
   "files": [
     "src/eip8182",
-    "src/bn254/yul/LibPoseidon2Yul.sol"
+    "src/bn254/yul/LibPoseidon2Yul.sol",
+    "artifacts"
   ],
   "devDependencies": {
     "prettier": "^3.8.1",
