@@ -70,7 +70,7 @@ contract MyApp {
 
 The `poseidon2.hash` view function can be passed directly as the custom hasher to OpenZeppelin's `MerkleTree` library (its pointer type is exactly `function(bytes32,bytes32) view returns (bytes32)`).
 
-> The upstream `hash_1/2/3` helpers ([`src/bn254/Poseidon2.sol`](src/bn254/Poseidon2.sol)) and the raw Yul/Solidity permutation remain available for callers that want the bare permutation rather than the sponge.
+> For callers that want the bare permutation rather than the sponge, the Yul library [`src/bn254/yul/LibPoseidon2Yul.sol`](src/bn254/yul/LibPoseidon2Yul.sol) exposes the upstream `hash_1/2/3` entry points (inlinable; no deployed contract needed).
 
 ## Gas
 

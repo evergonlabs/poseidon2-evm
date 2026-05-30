@@ -5,7 +5,6 @@ pragma solidity >=0.8.8;
 /// @notice View interface for the EIP-8182-conformant Poseidon2-BN254-t4 sponge.
 /// @dev    This is NOT the upstream zemse/poseidon2-evm IPoseidon2 (which
 ///         exposes hash_1/2/3 over uint256); the collision is of names only.
-///         See src/IPoseidon2.sol for the upstream interface.
 ///
 ///         The interface is `view`, deliberately. OZ MerkleTree's custom-hasher
 ///         pointer signature is `function(bytes32,bytes32) view returns (bytes32)`;

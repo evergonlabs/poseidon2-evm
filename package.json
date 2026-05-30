@@ -37,7 +37,8 @@
     "registry": "https://npm.pkg.github.com"
   },
   "files": [
-    "src"
+    "src/eip8182",
+    "src/bn254/yul/LibPoseidon2Yul.sol"
   ],
   "devDependencies": {
     "prettier": "^3.8.1",

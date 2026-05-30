@@ -20,10 +20,10 @@ EIP-8182-conformant Poseidon2-BN254-t4 sponge over the upstream
   every Yul / Solidity entry point. Silent mod-p would let an attacker
   construct `(x, x+p)` collisions. Huff is unchanged in this fork (not
   extended; see UPSTREAM).
-- **New view interface** `src/eip8182/IPoseidon2.sol` distinct from upstream
-  `src/IPoseidon2.sol`. The interface is `view` (matches OZ `MerkleTree`'s
-  custom-hasher pointer signature); the upstream interface exposes
-  `hash_1/2/3` and is unaffected.
+- **New view interface** `src/eip8182/IPoseidon2.sol`, distinct from the
+  upstream `hash_1/2/3` interface. It is `view` (matches OZ `MerkleTree`'s
+  custom-hasher pointer signature); the upstream `hash_1/2/3` interface is
+  unaffected.
 - **Multi-block sponge** via `LibPoseidon2Sponge.hashN` for arity > 3: a rate-3
   additive-duplex absorb built on `LibPoseidon2Yul.poseidon2_permute`, with a
   zero-padded short tail and the length carried in the IV (no trailing-1
