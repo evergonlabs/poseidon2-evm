@@ -1,28 +1,24 @@
 # Security Policy
 
-## Reporting a Vulnerability
+## Audit status
 
-If you discover a security vulnerability in this project, please report it responsibly:
+**Not audited.** The implementations in this repository have not undergone a
+formal third-party security audit. Review the code, and verify the constants
+and test vectors against your in-circuit gadget, before any production use.
 
-1. **Do NOT open a public GitHub issue**
-2. Contact the maintainer directly:
-   - Email: soham at zemse dot in
-   - Signal: zemse.05
-   - Telegram: @zemse
-3. Include a detailed description of the vulnerability and steps to reproduce
+## Reporting a vulnerability
 
-We will acknowledge receipt and work on mitigation ASAP.
+Please report security vulnerabilities **privately** — do not open a public
+issue.
+
+- Use GitHub's private vulnerability reporting on this repository: the
+  **Security** tab → **Report a vulnerability**.
+
+We will acknowledge receipt and work on a fix as soon as possible.
 
 ## Scope
 
-This policy applies to:
-
-- Poseidon2 hash function implementations (Solidity, Yul, Huff)
-- Helper libraries and interfaces
-- Incorrect usage of the library in external projects
-
-## Audit Status
-
-**These implementations have not yet undergone a formal third-party security audit.**
-
-Users are advised to conduct their own security reviews before deploying to production.
+This policy covers the Poseidon2 implementations and the EIP-8182 sponge
+wrapper in this repository (`src/`). For issues in the upstream
+[`zemse/poseidon2-evm`](https://github.com/zemse/poseidon2-evm) project,
+report them there.
