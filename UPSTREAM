@@ -1,0 +1,38 @@
+# UPSTREAM
+
+This branch (`eip8182-sponge`) forks from:
+
+  repo:        zemse/poseidon2-evm
+  branch:      main
+  commit:      d3cca6811b215972ed7e5f83ece1247d0e87d354
+  short:       d3cca68
+  message:     Input sanitization (#3)
+  date:        2026-02-14
+  describe:    v1.0.0-27-gd3cca68 (27 commits past the v1.0.0 tag)
+
+## How to compare against upstream
+
+    git fetch upstream
+    git diff upstream/main..HEAD
+
+## How to rebase onto a future upstream release
+
+    git fetch upstream
+    git rebase upstream/main
+
+## Branch purpose
+
+Add an EIP-8182-conformant sponge wrapper over the upstream
+Poseidon2-BN254-t4 permutation primitive — exposing the `IPoseidon2`
+interface (`hash(left, right)` + `hashN(bytes32[] calldata)`) with
+length-tagged IV, domain-tag-as-input-0 prepending, and canonical-input
+rejection.
+
+Generic improvements only; **no consumer-specific code in this branch**
+(originally motivated by a confidential-asset protocol's commitment scheme,
+but all changes here are upstream-compatible and could be proposed back to
+zemse/poseidon2-evm).
+
+## License
+
+MIT — retained from upstream.

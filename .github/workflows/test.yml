@@ -23,11 +23,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
 
+      # Install pinned Node devDeps (tsx) so the generator and constants check
+      # resolve them from the lockfile rather than fetching per run.
+      - name: Install Node dependencies
+        run: npm ci
+
+      # Foundry is pinned to `stable` so the gas snapshot is reproducible: the
+      # Solidity/Yul gas numbers are fixed by the pinned solc in foundry.toml
+      # plus the cancun opcode schedule (the forge version doesn't change them).
+      # huffc stays `nightly` because this action only publishes nightly assets
+      # (pinning a release tag like 0.3.2 404s); huffc is needed solely to
+      # compile the Huff *test* contract, whose hash-vector assertions are
+      # version-independent. Only Huff *gas* tracks the huffc version, and the
+      # snapshot deliberately EXCLUDES Huff (see gas-report.sh) so the floating
+      # huffc never breaks the gas diff.
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
+          version: stable
 
       - name: Install Huff
         uses: huff-language/huff-toolchain@v3
@@ -60,3 +75,13 @@ jobs:
           ./gas-report.sh
           diff gas-report.expected gas-report
         id: gas
+
+      # Always publish the freshly generated report so that, after a
+      # deliberate gas change, the new baseline can be downloaded from the run
+      # and committed verbatim (no local Linux/Huff needed to re-baseline).
+      - name: Upload regenerated gas report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gas-report
+          path: gas-report

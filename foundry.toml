@@ -2,12 +2,13 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-gas_reports = ["Poseidon2", "Poseidon2Yul", "Poseidon2Huff"]
+gas_reports = ["Poseidon2", "Poseidon2Yul", "Poseidon2Huff", "Poseidon2_EIP8182"]
 ffi = true
 solc_version = "0.8.30"
 evm_version = "cancun"
 optimizer = true
 optimizer_runs = 1000000
+fs_permissions = [{ access = "read", path = "./assets" }]
 
 [lint]
 exclude_lints = ["mixed-case-function", "mixed-case-variable", "screaming-snake-case-const"]

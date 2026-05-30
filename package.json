@@ -1,36 +1,47 @@
 {
-  "name": "poseidon2-evm",
-  "version": "1.0.0",
-  "description": "Solidity implementation of the Poseidon2 hash function for the EVM.",
+  "name": "@evergonlabs/poseidon2-evm",
+  "version": "0.1.0-eip8182",
+  "description": "EIP-8182-conformant Poseidon2-BN254 sponge hasher for the EVM, with a STATICCALL view interface (hash + domain-separated hashN).",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zemse/poseidon2-evm"
+    "url": "https://github.com/evergonlabs/poseidon2-evm"
   },
   "scripts": {
     "test": "forge test",
     "fmt": "prettier --write '**/*.{ts,js,json,md}' && forge fmt",
     "generate:yul": "npx tsx generate-yul.ts && forge fmt",
     "generate:huff": "npx tsx generate-huff.ts",
-    "generate:gas-report": "./gas-report.sh"
+    "generate:gas-report": "./gas-report.sh",
+    "verify:constants": "npx tsx scripts/verify-constants.ts"
   },
   "keywords": [
     "solidity",
     "evm",
     "poseidon2",
     "hash",
+    "hasher",
+    "sponge",
+    "eip-8182",
+    "bn254",
+    "merkle-tree",
+    "domain-separation",
     "foundry",
     "zk"
   ],
-  "author": "Soham Zemse",
+  "author": "Evergon Labs",
+  "contributors": [
+    "Soham Zemse (https://github.com/zemse)"
+  ],
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "files": [
-    "src",
-    "out/IPoseidon2.sol/IPoseidon2.json",
-    "out/Poseidon2.sol/Poseidon2_BN254.json",
-    "out/Poseidon2Yul.sol/Poseidon2Yul_BN254.json",
-    "out/LibPoseidon2Yul.sol/LibPoseidon2Yul.json"
+    "src/eip8182",
+    "src/bn254/yul/LibPoseidon2Yul.sol"
   ],
   "devDependencies": {
-    "prettier": "^3.8.1"
+    "prettier": "^3.8.1",
+    "tsx": "^4.22.3"
   }
 }
