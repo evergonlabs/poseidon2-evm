@@ -53,11 +53,8 @@ contract Poseidon2EIP8182Test is Test {
         ptr; // silence unused
     }
 
-    /// @notice STATICCALL truly sandboxes the hasher from caller storage.
-    ///         The hasher holds no storage, so the STATICCALL must succeed
-    ///         and never write — confirmed by the `view` qualifier on the
-    ///         interface + the `pure` impl, but a runtime check that low-
-    ///         level staticcall returns the same bytes is a useful sanity.
+    /// @notice Sanity: a low-level STATICCALL returns the same bytes as the
+    ///         high-level call. The hasher is storage-free.
     function test_low_level_staticcall_matches_high_level() public view {
         bytes32 l = bytes32(uint256(5));
         bytes32 r = bytes32(uint256(7));

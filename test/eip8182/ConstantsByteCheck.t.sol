@@ -12,9 +12,6 @@ contract ConstantsByteCheckTest is Test {
     ///         and cannot resolve `npm.cmd` by bare name, so we route through
     ///         `cmd /c`. On Linux/macOS we use `sh -c`.
     function test_constants_match_eip8182() public {
-        // Detect Windows via the OS env var (set to "Windows_NT" on Windows; unset elsewhere).
-        // On Windows, forge's FFI uses CreateProcess directly and cannot resolve `npm.cmd`
-        // by bare name, so we route through `cmd /c`. On Linux/macOS we use `sh -c`.
         bool isWindows = bytes(vm.envOr("OS", string(""))).length > 0;
         string[] memory cmd = new string[](3);
         if (isWindows) {

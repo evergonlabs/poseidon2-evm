@@ -22,9 +22,9 @@ import {InvalidHashNArity} from "../../src/eip8182/IPoseidon2.sol";
 ///             ]
 ///           }
 ///         9 vectors total; arities: 0, 1, 2, 3, 4, 5, 6, 17, 116.
-///         Arities 0 and 1 are excluded — hashN reverts
-///         on InvalidHashNArity for n < 2, matching EIP-8182 §3 which defines
-///         the hash only for n >= 2.
+///         Arities 0 and 1: EIP-8182 §3.3 defines the hash for all N >= 0, but
+///         this library rejects n < 2 with InvalidHashNArity (a tag with no
+///         payload is misuse), so those vectors are checked as expected reverts.
 contract Eip8182VectorsTest is Test {
     /// @notice External wrapper: routes a memory array through an external
     ///         call to satisfy hashN's `calldata` parameter requirement.

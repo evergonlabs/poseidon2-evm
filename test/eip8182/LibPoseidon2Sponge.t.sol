@@ -64,8 +64,7 @@ contract HashTreeNodeTest is Test {
     function test_hash_treenode_matches_zemse_hash2_vectors() public pure {
         // Same vectors as test/Poseidon2.t.sol::test_hash_2_vectors.
         // Tree-node hash is bare 2-input absorption with IV = 2<<64 — identical
-        // to upstream hash_2. "Per EIP-8182, Merkle tree-node hashes
-        // are bare 2-input absorptions with IV = 2<<64 and no domain tag."
+        // to upstream hash_2.
         bytes32 l = bytes32(uint256(0x1762d324c2db6a912e607fd09664aaa02dfe45b90711c0dae9627d62a4207788));
         bytes32 r = bytes32(uint256(0x1047bd52da536f6bdd26dfe642d25d9092c458e64a78211298648e81414cbf35));
         bytes32 expected = bytes32(uint256(0x303cacb84a267e5f3f46914fd3262dcaa212930c27a2f9de22c080dd9857be35));
@@ -166,7 +165,7 @@ contract HashNMultiBlockTest is Test {
     using Field for *;
 
     /// @notice Reference helper: pure-Solidity LibPoseidon2 with EIP-8182-style
-    ///         absorb (is_variable_length=false). This IS the EIP-8182 §10
+    ///         absorb (is_variable_length=false). This IS the EIP-8182 §3.3
     ///         construction — additive duplex, zero-padded short tail, length
     ///         in the IV. The only difference from the optimized Yul path is
     ///         speed (and that this reference reverts via Field.toField on

@@ -68,7 +68,7 @@ library LibPoseidon2Sponge {
         // Multi-block additive-duplex absorb (arity > 3). Initial state =
         // (0, 0, 0, iv). For each rate-3 chunk: state[0..2] += chunk[0..2]
         // (mod PRIME); then permute. Last chunk is zero-padded if n is not
-        // a multiple of 3. Per EIP-8182 §3.1.
+        // a multiple of 3. Per EIP-8182 §3.3.
         uint256 PRIME_ = PRIME();
         uint256 st0 = 0;
         uint256 st1 = 0;
