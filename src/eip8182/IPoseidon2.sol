@@ -19,7 +19,7 @@ interface IPoseidon2 {
     function hash(bytes32 left, bytes32 right) external view returns (bytes32);
 
     /// @notice Fixed-arity, domain-separated absorption.
-    /// @dev    inputs[0] MUST be the domain tag computed per EIP-8182 §10 as
+    /// @dev    inputs[0] MUST be the domain tag computed per EIP-8182 §3.1 as
     ///         fieldElement(keccak256("eip-8182.<name>")).
     ///         Reverts InvalidHashNArity(length) on inputs.length == 0 or 1
     ///         (a tag with no payload is a misuse).

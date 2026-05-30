@@ -16,7 +16,7 @@ library LibPoseidon2Sponge {
     }
 
     /// @notice 2-input tree-node hash. Untagged, IV = 2<<64.
-    /// @dev    Canonical-input checks live inside LibPoseidon2Yul.poseidon2_core:
+    /// @dev    Canonical-input checks live inside LibPoseidon2Yul.poseidon2_permute:
     ///         it reverts on rate inputs >= PRIME. Passing `left`/
     ///         `right` through is safe.
     function hash(bytes32 left, bytes32 right) internal pure returns (bytes32) {
@@ -36,7 +36,7 @@ library LibPoseidon2Sponge {
 
     /// @notice Fixed-arity domain-separated absorption.
     /// @dev    inputs[0] is the caller-supplied domain tag (derived per
-    ///         EIP-8182 §10; not auto-prepended by this library). For arity
+    ///         EIP-8182 §3.1; not auto-prepended by this library). For arity
     ///         2-3 this is a single permutation; for
     ///         arity > 3 it absorbs in rate-3 blocks with additive duplex
     ///         (state[i] += block[i]) between permutations.
@@ -51,7 +51,7 @@ library LibPoseidon2Sponge {
 
         if (n <= 3) {
             // Single-permutation path (arity 2-3). Loads up to 3 rate lanes,
-            // zero-pads the rest. poseidon2_core inherits the canonical-input
+            // zero-pads the rest. poseidon2_permute inherits the canonical-input
             // check on s0/s1/s2.
             uint256 s0_;
             uint256 s1_;
@@ -68,7 +68,7 @@ library LibPoseidon2Sponge {
         // Multi-block additive-duplex absorb (arity > 3). Initial state =
         // (0, 0, 0, iv). For each rate-3 chunk: state[0..2] += chunk[0..2]
         // (mod PRIME); then permute. Last chunk is zero-padded if n is not
-        // a multiple of 3. Per EIP-8182 §10.
+        // a multiple of 3. Per EIP-8182 §3.1.
         uint256 PRIME_ = PRIME();
         uint256 st0 = 0;
         uint256 st1 = 0;
