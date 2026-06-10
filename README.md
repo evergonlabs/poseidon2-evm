@@ -16,7 +16,7 @@ Details and design notes: [`src/eip8182/README.md`](src/eip8182/README.md).
 
 ### Key properties
 
-- **EIP-8182 conformant.** Length-tagged IV (`inputCount << 64`), domain tag as input element 0, untagged tree-node hash — verified against EIP-8182's published constants and normative vectors (pinned in [`assets/eip-8182/`](assets/eip-8182/)).
+- **EIP-8182 conformant.** Length-tagged IV (`inputCount << 64`), domain tag as input element 0, untagged tree-node hash — verified against EIP-8182's published constants and normative vectors, pinned to [`ethereum/EIPs@d1040a4c`](https://github.com/ethereum/EIPs/tree/d1040a4c1c6b68ba1c63a35305d08d6cc75b4797/assets/eip-8182) (also under [`assets/eip-8182/`](assets/eip-8182/), exported by this package).
 - **Rejects non-canonical inputs.** Every entry point reverts `InvalidFieldElement(uint256)` on inputs `>= p` instead of silently reducing mod `p` (silent reduction would let an attacker construct `(x, x+p)` collisions). This diverges from upstream's `hash_1/2/3`, which silently reduced.
 - **Not deployed yet.** This fork ships source only; there are no production deployments. Deploy `Poseidon2_EIP8182` per chain and record the address.
 
