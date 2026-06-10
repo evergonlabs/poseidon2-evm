@@ -14,7 +14,8 @@ artifacts/
 # Docs
 docs/
 
-# Dotenv file
+# Local secrets / auth — never commit (npm auth token, dotenv)
+.npmrc
 .env
 
 # Dependencies
