@@ -1,6 +1,6 @@
 {
   "name": "@evergonlabs/poseidon2-evm",
-  "version": "0.2.0-eip8182",
+  "version": "0.1.1-eip8182",
   "description": "EIP-8182-conformant Poseidon2-BN254 sponge hasher for the EVM, with a STATICCALL view interface (hash + domain-separated hashN).",
   "repository": {
     "type": "git",
